@@ -1,0 +1,87 @@
+{
+  "name": "haven-portal",
+  "version": "1.0.0",
+  "description": "user portal for haven development",
+  "main": "index.js",
+  "repository": "git@github.com:asibilla/haven-portal.git",
+  "author": "asibilla <mr.andy.sibilla@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --mode production",
+    "format": "prettier --write \"**/*.{js,json}\"",
+    "jest": "jest",
+    "lint": "eslint src/",
+    "start": "webpack-dev-server --open --inline",
+    "test": "concurrently 'npm run lint' 'npm run jest'"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.668.0",
+    "emotion": "^9.1.3",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-emotion": "^9.2.12",
+    "react-router-dom": "^5.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-react": "^7.9.4",
+    "@testing-library/react": "^10.0.3",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.4.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-emotion": "^10.0.33",
+    "babel-plugin-jsx-remove-data-test-id": "^2.1.3",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
+    "concurrently": "^5.1.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-json": "^2.1.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.0",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.2.0",
+    "husky": "^4.2.5",
+    "jest": "^25.4.0",
+    "jest-diff": "^25.4.0",
+    "jest-dom": "^4.0.0",
+    "jest-extended": "^0.11.5",
+    "jest-html-reporter": "^3.1.0",
+    "jest-junit-reporter": "^1.1.0",
+    "lint-staged": "^10.1.6",
+    "prettier": "^2.0.4",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "pra": {
+    "reports": [
+      {
+        "type": "istanbul",
+        "displayName": "jest coverage",
+        "analyze": "coverage/coverage-summary.json",
+        "archiveTarget": "coverage",
+        "archiveIndex": "coverage/lcov-report/index.html"
+      }
+    ]
+  }
+}
