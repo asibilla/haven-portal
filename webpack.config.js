@@ -1,4 +1,5 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
@@ -34,6 +35,7 @@ module.exports = {
   },
   plugins: [
     // new CopyWebpackPlugin([{ from: 'src/images', to: 'images' }]),
+    new Dotenv(),
     new HtmlWebPackPlugin({
       template: './src/index.html',
       filename: './index.html',

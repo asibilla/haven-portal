@@ -1,9 +1,14 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+
+import { ViewWrapper } from './views/components';
 
 const App = () => {
   return (
     <div>
-      <h1>Hello World!</h1>
+        <BrowserRouter>
+            <ViewWrapper />
+        </BrowserRouter>
     </div>
   );
 };
