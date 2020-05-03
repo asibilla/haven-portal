@@ -1,20 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { isAuthenticated } from './helpers/auth';
+import AppContext from './helpers/context';
 import { ViewWrapper } from './views/components';
 
 const App = ({ url }) => {
+    const [ authData, updateAuthData ] = useState({});
+
   useEffect(() => {
-      isAuthenticated();
+    (async () => {
+        const auth = await isAuthenticated();
+        updateAuthData(auth);
+      })()
   }, [url]);
 
   return (
-    <div>
+    <AppContext.Provider value={{ authData }}>
       <BrowserRouter>
         <ViewWrapper />
       </BrowserRouter>
-    </div>
+    </AppContext.Provider>
   );
 };
 
