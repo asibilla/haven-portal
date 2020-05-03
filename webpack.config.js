@@ -1,10 +1,14 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
+// const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv').config();
 
 module.exports = {
-  entry: './src/index.js',
+  entry: [
+    '@babel/polyfill',
+    './src/index.js'
+  ],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
@@ -35,10 +39,12 @@ module.exports = {
   },
   plugins: [
     // new CopyWebpackPlugin([{ from: 'src/images', to: 'images' }]),
-    new Dotenv(),
     new HtmlWebPackPlugin({
       template: './src/index.html',
       filename: './index.html',
     }),
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(dotenv.parsed),
+    })
   ],
 };
