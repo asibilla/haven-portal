@@ -15,8 +15,19 @@ const App = ({ url }) => {
       })()
   }, [url]);
 
+  const addAuthData = (data) => {
+    const newAuthData = {
+      ...authData,
+      ...data,
+    };
+
+    updateAuthData(newAuthData);
+  };
+
+  const clearAuthData = () => updateAuthData({});
+
   return (
-    <AppContext.Provider value={{ authData }}>
+    <AppContext.Provider value={{ addAuthData, authData, clearAuthData }}>
       <BrowserRouter>
         <ViewWrapper />
       </BrowserRouter>

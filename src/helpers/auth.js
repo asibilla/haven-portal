@@ -1,16 +1,25 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
+import { forEach, get } from 'lodash';
 
 
+export const getJwt = (authData) => get(authData, 'accessData.jwtToken', null);
+export const getUser = (authData) => get(authData, 'user', null);
+export const getUserGroups = (authData) => get(authData, 'accessData.payload.cognito:groups', []);
+export const getUserPool = (authData) => get(authData, 'userPool', null);
+export const getUserPoolData = () => ({ ClientId: process.env.CLIENT_ID, UserPoolId: process.env.USER_POOL_ID, });
 
-const isAuthenticated = () => {
-  console.log(process.env.USER_POOL_ID);
-  
-  const data = {
-      UserPoolId: process.env.USER_POOL_ID,
-      ClientId: process.env.CLIENT_ID
-  };
+export const isAdmin = (authData) => {
+    let admin = false;
+    forEach(getUserGroups(authData), (group) => {
+        if (group.indexOf('admin') === 0) {
+            admin = true;
+        }
+    });
+    return admin;
+};
 
-   const userPool = new CognitoUserPool(data);
+export const isAuthenticated = () => {  
+   const userPool = new CognitoUserPool(getUserPoolData());
    const user = userPool.getCurrentUser();
    
    return new Promise((resolve, reject) => {
@@ -29,16 +38,14 @@ const isAuthenticated = () => {
                     accessData: session.accessToken,
                     user,
                     userPool,
-
                 });
             }
            });
        }
    });
-
 };
 
-const completePasswordChallenge = (user) => {
+export const completePasswordChallenge = (user) => {
     user.completeNewPasswordChallenge('password', {}, {
         onSuccess: (response) => {
             console.log('complete password success', response);
@@ -49,21 +56,14 @@ const completePasswordChallenge = (user) => {
     })
 };
 
-const signIn = ({ password, userName }) => {
-    const authData = {
+export const signIn = ({ authData, onLogin, password, userName }) => {
+    const loginData = {
         Username: userName,
         Password: password,
     };
 
-    const authDetails = new AuthenticationDetails(authData);
-console.log('auth data', authDetails);
-    const data = {
-        UserPoolId: process.env.USER_POOL_ID,
-        ClientId: process.env.CLIENT_ID
-    };
-
-    const userPool = new CognitoUserPool(data);
-console.log('pool', userPool);
+    const authDetails = new AuthenticationDetails(loginData);
+    const userPool = getUserPool(authData) || new CognitoUserPool(getUserPoolData());
 
     const userData = {
         Username: userName,
@@ -71,7 +71,7 @@ console.log('pool', userPool);
     };
 
     const user = new CognitoUser(userData);
-console.log('user', user);
+
 
     try {
         user.authenticateUser(authDetails, {
@@ -80,18 +80,36 @@ console.log('user', user);
                 completePasswordChallenge(user)
             },
             onSuccess: (result) => {
-                console.log('in on success', result);
+                onLogin({
+                    accessData: result.accessToken,
+                    user,
+                    userPool,
+                });
             },
             onFailure: (e) => {
+                // TODO: Display authentication error.
                 console.log('in on failure', e);
             }
         });
     }
 
     catch(e) {
+        // TODO: display js error. 
         console.log('an error', e);
     }
-
 };
 
-export { isAuthenticated, signIn };
+export const signOut = (user) => {
+    if (user) {
+        try {
+            user.signOut();
+            return true;
+        }
+        catch(e) {
+            return false;
+        }
+    }
+    return false;
+}
+
+

@@ -1,27 +1,38 @@
 import React, { useContext, useState } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
 
-import { signIn } from '../../helpers/auth';
+import { routes } from '../../constants';
+import { getJwt, isAdmin, signIn } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
 import { Button, TextInput } from '../components';
 
 const UserSignin = () => {
   const [ userName, setUserName ] = useState('');
   const [ password, setPassword ] = useState('');
-
-
-  /**
-   * TODO NEXT: if accessToken, redirect based on user group.
-   * if no access, pass userpool to signin so we don't have to recreate. 
-   */
-  const { authData } = useContext(AppContext);
-  console.log('auth data', authData);
+  const history = useHistory();
+  const { addAuthData, authData } = useContext(AppContext);
 
   const updateUserName = (e) => setUserName(e.target.value);
   const updatePassword = (e) => setPassword(e.target.value);
+
+  const onLogin = (newAuthData) => {
+    addAuthData(newAuthData);
+    const redirectRoute = isAdmin(newAuthData) ? routes.adminHome : routes.userHome;
+    history.push(redirectRoute);
+  };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
-    signIn({ password, userName });
+    signIn({ authData, onLogin, password, userName });
   };
+
+
+  if (getJwt(authData)) {
+    if (isAdmin(authData)) {
+      return <Redirect to={routes.adminHome} />
+    }
+    return <Redirect to={routes.userHome} />
+  }
 
   return (
     <div>

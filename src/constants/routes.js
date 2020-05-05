@@ -1,6 +1,7 @@
 const routes = {
+  adminHome: '/admin',
+  userHome: '/welcome',
   userSignIn: '/',
-  adminSignIn: '/admin',
 };
 
 export default routes;
