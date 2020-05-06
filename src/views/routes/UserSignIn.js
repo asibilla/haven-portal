@@ -9,13 +9,22 @@ import { Button, TextInput } from '../components';
 const UserSignin = () => {
   const [ userName, setUserName ] = useState('');
   const [ password, setPassword ] = useState('');
+  const [ formError, setFormError ] = useState('');
+  const [ shouldShowPasswordChallenge, showPasswordChallenge ] = useState(false);
+
   const history = useHistory();
   const { addAuthData, authData } = useContext(AppContext);
 
   const updateUserName = (e) => setUserName(e.target.value);
   const updatePassword = (e) => setPassword(e.target.value);
 
+
+  const onError = (msg) => {
+    setFormError(msg);
+  };
+
   const onLogin = (newAuthData) => {
+    setFormError('');
     addAuthData(newAuthData);
     const redirectRoute = isAdmin(newAuthData) ? routes.adminHome : routes.userHome;
     history.push(redirectRoute);
@@ -23,7 +32,7 @@ const UserSignin = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    signIn({ authData, onLogin, password, userName });
+    signIn({ authData, onError, onLogin, password, userName });
   };
 
 
@@ -40,6 +49,9 @@ const UserSignin = () => {
         User Sign In Page
       </h1>
       <form onSubmit={handleSubmit}>
+        { formError && (
+          <span>{formError}</span>
+        )}
         <TextInput 
           onChange={updateUserName}
           placeholder="username"

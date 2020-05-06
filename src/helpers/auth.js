@@ -56,7 +56,7 @@ export const completePasswordChallenge = (user) => {
     })
 };
 
-export const signIn = ({ authData, onLogin, password, userName }) => {
+export const signIn = ({ authData, onError, onLogin, password, userName }) => {
     const loginData = {
         Username: userName,
         Password: password,
@@ -87,15 +87,13 @@ export const signIn = ({ authData, onLogin, password, userName }) => {
                 });
             },
             onFailure: (e) => {
-                // TODO: Display authentication error.
-                console.log('in on failure', e);
+                onError(e.message || 'An error occured. Please try again.');
             }
         });
     }
 
     catch(e) {
-        // TODO: display js error. 
-        console.log('an error', e);
+        onError(e.message || 'An error occured. Please try again.');
     }
 };
 
