@@ -13,6 +13,7 @@ module.exports = {
           },
         ],
         ['babel-plugin-jsx-remove-data-test-id'],
+        ['transform-async-to-generator'],
       ],
     },
   },
