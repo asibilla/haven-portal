@@ -5,10 +5,7 @@ const webpack = require('webpack');
 const dotenv = require('dotenv').config();
 
 module.exports = {
-  entry: [
-    '@babel/polyfill',
-    './src/index.js'
-  ],
+  entry: ['@babel/polyfill', './src/index.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
@@ -44,7 +41,7 @@ module.exports = {
       filename: './index.html',
     }),
     new webpack.DefinePlugin({
-      "process.env": JSON.stringify(dotenv.parsed),
-    })
+      'process.env': JSON.stringify(dotenv.parsed),
+    }),
   ],
 };

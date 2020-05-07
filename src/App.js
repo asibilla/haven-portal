@@ -6,13 +6,13 @@ import AppContext from './helpers/context';
 import { ViewWrapper } from './views/components';
 
 const App = ({ url }) => {
-    const [ authData, updateAuthData ] = useState({});
+  const [authData, updateAuthData] = useState({});
 
   useEffect(() => {
     (async () => {
-        const auth = await isAuthenticated();
-        updateAuthData(auth);
-      })()
+      const auth = await isAuthenticated();
+      updateAuthData(auth);
+    })();
   }, [url]);
 
   const addAuthData = (data) => {

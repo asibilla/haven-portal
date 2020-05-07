@@ -14,7 +14,7 @@ const AdminHome = () => {
   }
 
   if (!isAdmin(authData)) {
-    return <Redirect to ={routes.userHome} />;
+    return <Redirect to={routes.userHome} />;
   }
 
   return (
