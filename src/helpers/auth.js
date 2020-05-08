@@ -1,13 +1,15 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
 import { forEach, get } from 'lodash';
 
+import { cognitoClient, cognitoPool } from '../constants';
+
 export const getJwt = (authData) => get(authData, 'accessData.jwtToken', null);
 export const getUser = (authData) => get(authData, 'user', null);
 export const getUserGroups = (authData) => get(authData, 'accessData.payload.cognito:groups', []);
 export const getUserPool = (authData) => get(authData, 'userPool', null);
 export const getUserPoolData = () => ({
-  ClientId: process.env.CLIENT_ID,
-  UserPoolId: process.env.USER_POOL_ID,
+  ClientId: cognitoClient,
+  UserPoolId: cognitoPool,
 });
 
 export const isAdmin = (authData) => {
