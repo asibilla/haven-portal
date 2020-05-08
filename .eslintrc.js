@@ -18,6 +18,7 @@ module.exports = {
   plugins: ['react', 'import', 'json', 'jest'],
   rules: {
     'import/prefer-default-export': 0,
+    'react/button-has-type': 0,
     'react/jsx-filename-extension': 0,
     'react/require-default-props': ['error', { forbidDefaultForRequired: true }],
   },

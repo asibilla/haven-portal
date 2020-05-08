@@ -1,3 +1,4 @@
+import { string } from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -33,6 +34,14 @@ const App = ({ url }) => {
       </BrowserRouter>
     </AppContext.Provider>
   );
+};
+
+App.defaultProps = {
+  url: '',
+};
+
+App.propTypes = {
+  url: string,
 };
 
 export default App;

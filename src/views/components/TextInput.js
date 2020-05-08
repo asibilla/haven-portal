@@ -3,8 +3,14 @@ import React from 'react';
 
 const TextInput = ({ onChange, placeholder, type, value }) => {
   return (
-    <label>
-      <input onChange={onChange} type={type} placeholder={placeholder} value={value} />
+    <label htmlFor={placeholder}>
+      <input
+        id={placeholder}
+        onChange={onChange}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+      />
     </label>
   );
 };

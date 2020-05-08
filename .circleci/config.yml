@@ -1,0 +1,45 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@0.1.18
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+jobs:
+  build:
+    working_directory: ~/haven-portal
+    docker:
+      - image: circleci/node:10.16.3
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn lint
+      - run: yarn build
+      - persist_to_workspace:
+          root: ~/haven-portal
+          paths: 
+            - node_modules
+            - dist
+      - store_test_results: 
+          path: ~/haven-portal/coverage/junit.xml
+  deploy:
+    docker:
+      - image: 'cimg/python:3.6'
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/haven-portal
+      - aws-cli/setup:
+          profile-name: default
+      - run:
+          name: Upload file to s3
+          command: aws s3 sync ~/haven-portal/dist/ s3://haven-portal/website
