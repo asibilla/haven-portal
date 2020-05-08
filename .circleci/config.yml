@@ -42,4 +42,4 @@ jobs:
           profile-name: default
       - run:
           name: Upload file to s3
-          command: aws s3 sync ~/haven-portal/dist/ s3://haven-portal/website
+          command: aws s3 sync ~/haven-portal/dist/ s3://haven-portal
