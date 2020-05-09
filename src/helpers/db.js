@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk';
-import {forEach } from 'lodash';
+import { forEach } from 'lodash';
 
 import { region } from '../constants';
 
@@ -17,22 +17,21 @@ const getDocClient = (authData) => {
   });
 };
 
-export const scanDB = (authData, tableName) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const docClient = await getDocClient(authData);
+export const scanDB = async ({ authData, tableName }) => {
+  try {
+    const docClient = await getDocClient(authData);
+    return new Promise((resolve, reject) => {
       docClient.scan({ TableName: tableName }, (err, data) => {
         if (err) {
           reject(err);
         } else {
-          console.log(data);
           resolve(data);
         }
       });
-    } catch (e) {
-      reject(e);
-    }
-  });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
 };
 
 // TODO: expand class for more than just equality condition expressions.
@@ -50,35 +49,45 @@ export class DBQueryItem {
   get expressionAttributeValue() {
     return {
       [this.id]: this.value,
-    }
+    };
   }
 }
 
 const createQuery = ({ queryItems, tableName }) => {
   let expression = '';
   let attributes = {};
-
-}
-
-export const queryDB = ({ authData, tableName, queryItems }) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const docClient = await getDocClient(authData);
-      // const query = {
-      //   TableName: tableName,
-      //   KeyConditionExpression: 'id = :i',
-      //   ExpressionAttributeValues: {
-      //     ':i': 'test',
-      //   },
-      // };
-
-      // docClient.query(query, (err, data) => {
-      //   console.log(err);
-      //   console.log(data);
-      // });
+  forEach(queryItems, (item, index) => {
+    expression += item.keyConditionExpression;
+    if (queryItems.length > index + 1) {
+      expression += ' and ';
     }
-    catch(e) {
-      reject(e);
-    }
+    attributes = {
+      ...attributes,
+      ...item.expressionAttributeValue,
+    };
   });
-}
+
+  return {
+    TableName: tableName,
+    KeyConditionExpression: expression,
+    ExpressionAttributeValues: attributes,
+  };
+};
+
+export const queryDB = async ({ authData, queryItems, tableName }) => {
+  try {
+    const docClient = await getDocClient(authData);
+    const query = createQuery({ queryItems, tableName });
+    return new Promise((resolve, reject) => {
+      docClient.query(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
