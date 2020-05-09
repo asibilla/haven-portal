@@ -1,9 +1,10 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
+import { config, CognitoIdentityCredentials } from 'aws-sdk';
 import { forEach, get } from 'lodash';
 
-import { cognitoClient, cognitoPool } from '../constants';
+import { cognitoClient, cognitoIdPool, cognitoPool, region } from '../constants';
 
-export const getJwt = (authData) => get(authData, 'accessData.jwtToken', null);
+export const getJwt = (authData) => get(authData, 'idData.jwtToken', null);
 export const getUser = (authData) => get(authData, 'user', null);
 export const getUserGroups = (authData) => get(authData, 'accessData.payload.cognito:groups', []);
 export const getUserPool = (authData) => get(authData, 'userPool', null);
@@ -22,6 +23,19 @@ export const isAdmin = (authData) => {
   return admin;
 };
 
+export const createConfig = (authData) => {
+  const paramCredentials = {
+    IdentityPoolId: cognitoIdPool,
+    Logins: {
+      [`cognito-idp.${region}.amazonaws.com/${cognitoPool}`]: getJwt(authData),
+    },
+  };
+
+  config.region = region;
+  config.credentials = new CognitoIdentityCredentials(paramCredentials);
+  return config;
+};
+
 export const isAuthenticated = () => {
   const userPool = new CognitoUserPool(getUserPoolData());
   const user = userPool.getCurrentUser();
@@ -36,10 +50,16 @@ export const isAuthenticated = () => {
         if (err) {
           reject(err);
         } else {
-          resolve({
+          const authData = {
             accessData: session.accessToken,
+            idData: session.idToken,
             user,
             userPool,
+          };
+
+          resolve({
+            ...authData,
+            awsConfig: createConfig(authData),
           });
         }
       });
@@ -54,9 +74,15 @@ export const completePasswordChallenge = ({ authData, onError, onLogin, password
     {},
     {
       onSuccess: (result) => {
-        onLogin({
+        const newAuthData = {
+          ...authData,
           accessData: result.accessToken,
+          idData: result.idToken,
           user,
+        };
+        onLogin({
+          ...newAuthData,
+          awsConfig: createConfig(newAuthData),
         });
       },
       onFailure: (e) => {
@@ -95,10 +121,16 @@ export const signIn = ({
         onNewPasswordRequired({ requiredAttributes, user, userAttributes });
       },
       onSuccess: (result) => {
-        onLogin({
+        const newAuthData = {
+          ...authData,
           accessData: result.accessToken,
+          idData: result.idToken,
           user,
           userPool,
+        };
+        onLogin({
+          ...newAuthData,
+          awsConfig: createConfig(newAuthData),
         });
       },
       onFailure: (e) => {

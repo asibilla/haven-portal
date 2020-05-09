@@ -8,11 +8,13 @@ import { ViewWrapper } from './views/components';
 
 const App = ({ url }) => {
   const [authData, updateAuthData] = useState({});
+  const [authVerified, setAuthVerified] = useState(false);
 
   useEffect(() => {
     (async () => {
       const auth = await isAuthenticated();
       updateAuthData(auth);
+      setAuthVerified(true);
     })();
   }, [url]);
 
@@ -29,9 +31,7 @@ const App = ({ url }) => {
 
   return (
     <AppContext.Provider value={{ addAuthData, authData, clearAuthData }}>
-      <BrowserRouter>
-        <ViewWrapper />
-      </BrowserRouter>
+      <BrowserRouter>{authVerified && <ViewWrapper />}</BrowserRouter>
     </AppContext.Provider>
   );
 };
