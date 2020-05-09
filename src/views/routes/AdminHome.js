@@ -1,16 +1,18 @@
 import { string } from 'prop-types';
 import React, { useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
-import { routes } from '../../constants';
+import { routes, styles } from '../../constants';
 import { getJwt, isAdmin } from '../../helpers/auth';
 // import { scanDB } from '../../helpers/db';
 import AppContext from '../../helpers/context';
-import { SignOutButton } from '../components';
+import { AdminHeader } from '../components';
+import ManageOptions from './ManageOptions';
 
 const AdminHome = ({ url }) => {
   const { authData } = useContext(AppContext);
   const history = useHistory();
+  const match = useRouteMatch();
 
   useEffect(() => {
     (async () => {
@@ -28,9 +30,15 @@ const AdminHome = ({ url }) => {
   }, [url]);
 
   return (
-    <div>
-      <h1>Admin Home Page</h1>
-      <SignOutButton />
+    <div className="admin-view">
+      <AdminHeader />
+      <div className={styles.contentSection}>
+        <h3>Admin Home Page</h3>
+      </div>
+
+      <Switch>
+        <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
+      </Switch>
     </div>
   );
 };
