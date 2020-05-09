@@ -27,7 +27,7 @@ export const createConfig = (authData) => {
   const paramCredentials = {
     IdentityPoolId: cognitoIdPool,
     Logins: {
-      [cognitoPool]: getJwt(authData),
+      [`cognito-idp.${region}.amazonaws.com/${cognitoPool}`]: getJwt(authData),
     },
   };
 
