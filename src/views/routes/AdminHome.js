@@ -20,7 +20,7 @@ const AdminHome = ({ url }) => {
       if (!isAdmin(authData)) {
         history.push(routes.userSignIn);
       }
-      scanDB(authData);
+      scanDB(authData, 'options');
     })();
   }, [url]);
 
