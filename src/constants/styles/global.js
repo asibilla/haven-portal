@@ -30,13 +30,32 @@ export const mobile = `@media only screen and (max-width: ${largeBreakpoint - 1}
  *
  */
 export const black = '#000';
+export const darkGrey = '#5B5C5E';
 export const lightGrey = '#a3a3a3';
+export const redError = '#b22222';
+export const white = '#fff';
 
 /**
  *
  * Styles
  *
  */
+export const button = css`
+  background-color: ${black};
+  border: 1px solid ${black};
+  border-radius: 18px;
+  color: ${white};
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 125px;
+  padding: 12px 15px;
+`;
+
+export const errorText = css`
+  color: ${redError};
+  margin-bottom: 8px;
+`;
 
 export const flexRow = css`
   align-items: center;
@@ -57,6 +76,18 @@ export const positonRelative = css`
 
 export const scalableImage = css`
   max-width: 100%;
+  width: 100%;
+`;
+
+export const textAlignLeft = css`
+  text-align: left;
+`;
+
+export const textInput = css`
+  border: solid 1px ${darkGrey};
+  border-radius: 5px;
+  margin-bottom: 15px;
+  padding: 8px 15px;
   width: 100%;
 `;
 

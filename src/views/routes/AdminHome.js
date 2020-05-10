@@ -7,6 +7,7 @@ import { getJwt, isAdmin } from '../../helpers/auth';
 // import { scanDB } from '../../helpers/db';
 import AppContext from '../../helpers/context';
 import { AdminHeader } from '../components';
+import AdminOverview from './AdminOverview';
 import ManageOptions from './ManageOptions';
 
 const AdminHome = ({ url }) => {
@@ -33,12 +34,11 @@ const AdminHome = ({ url }) => {
     <div className="admin-view">
       <AdminHeader />
       <div className={styles.contentSection}>
-        <h3>Admin Home Page</h3>
+        <Switch>
+          <Route exact path={match.path} component={AdminOverview} />
+          <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
+        </Switch>
       </div>
-
-      <Switch>
-        <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
-      </Switch>
     </div>
   );
 };

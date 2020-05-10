@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { Redirect, useHistory } from 'react-router-dom';
 
-import { routes } from '../../constants';
+import { routes, styles } from '../../constants';
+import { listStyle, logoWrapper, passwordMargin, wrapper } from '../../constants/styles/signin';
 import { completePasswordChallenge, getJwt, isAdmin, signIn } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
 import { Button, TextInput } from '../components';
@@ -63,56 +64,61 @@ const UserSignin = () => {
     return <Redirect to={routes.userHome} />;
   }
 
-  if (shouldShowPasswordChallenge) {
-    return (
-      <div>
-        <h1>Please select a new password</h1>
-        <p>Passwords must include:</p>
-        <ul>
-          <li>At least 8 characters</li>
-          <li>At least 1 lowercase character</li>
-          <li>At least 1 uppercase character</li>
-          <li>At least 1 number</li>
-          <li>At least 1 special character (e.g. @,!,$,-)</li>
-        </ul>
-        <form onSubmit={handlePasswordChallengeSubmit}>
-          {formError && <span>{formError}</span>}
-          <TextInput
-            onChange={createUpdateFormValueFn(setNewPassword)}
-            placeholder="password"
-            type="password"
-            value={newPassword}
-          />
-          <TextInput
-            onChange={createUpdateFormValueFn(setConfirmPassword)}
-            placeholder="confirm password"
-            type="password"
-            value={confirmPassword}
-          />
-          <Button text="submit" type="submit" />
-        </form>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <h1>Log In</h1>
-      <form onSubmit={handleSubmit}>
-        {formError && <span>{formError}</span>}
-        <TextInput
-          onChange={createUpdateFormValueFn(setUserName)}
-          placeholder="username"
-          value={userName}
-        />
-        <TextInput
-          onChange={createUpdateFormValueFn(setPassword)}
-          placeholder="password"
-          type="password"
-          value={password}
-        />
-        <Button text="submit" type="submit" />
-      </form>
+    <div className={wrapper}>
+      <div className={logoWrapper}>
+        <img alt="Haven Development Logo" src="/images/haven-logo.jpg" />
+      </div>
+      {!shouldShowPasswordChallenge ? (
+        <>
+          <h3>LOG IN</h3>
+          <form onSubmit={handleSubmit}>
+            {formError && <p className={styles.errorText}>{formError}</p>}
+            <TextInput
+              onChange={createUpdateFormValueFn(setUserName)}
+              placeholder="Username"
+              value={userName}
+            />
+            <TextInput
+              className={passwordMargin}
+              onChange={createUpdateFormValueFn(setPassword)}
+              placeholder="Password"
+              type="password"
+              value={password}
+            />
+            <Button text="submit" type="submit" />
+          </form>
+        </>
+      ) : (
+        <>
+          <h4>Please select a new password</h4>
+          <p className={styles.textAlignLeft}>Passwords must include:</p>
+          <ul className={listStyle}>
+            <li>At least 8 characters</li>
+            <li>At least 1 lowercase character</li>
+            <li>At least 1 uppercase character</li>
+            <li>At least 1 number</li>
+            <li>At least 1 special character (e.g. @,!,$,-)</li>
+          </ul>
+          <form onSubmit={handlePasswordChallengeSubmit}>
+            {formError && <p className={styles.errorText}>{formError}</p>}
+            <TextInput
+              onChange={createUpdateFormValueFn(setNewPassword)}
+              placeholder="Password"
+              type="password"
+              value={newPassword}
+            />
+            <TextInput
+              className={passwordMargin}
+              onChange={createUpdateFormValueFn(setConfirmPassword)}
+              placeholder="Confirm Password"
+              type="password"
+              value={confirmPassword}
+            />
+            <Button text="Submit" type="submit" />
+          </form>
+        </>
+      )}
     </div>
   );
 };
