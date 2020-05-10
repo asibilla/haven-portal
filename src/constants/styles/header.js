@@ -14,10 +14,13 @@ export const navLink = css`
   font-weight: 600;
   margin: 0 24px;
   text-decoration: none;
+  &.active {
+    color: ${lightGrey};
+  }
   &:hover {
     color: ${lightGrey};
   }
-  &:visited {
+  &:visited:not(.active) {
     color: ${black};
   }
 `;
