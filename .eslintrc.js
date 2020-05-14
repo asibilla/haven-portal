@@ -20,6 +20,8 @@ module.exports = {
     'import/prefer-default-export': 0,
     'react/button-has-type': 0,
     'react/jsx-filename-extension': 0,
+    'react/jsx-props-no-spreading': 0,
     'react/require-default-props': ['error', { forbidDefaultForRequired: true }],
+    'react/state-in-constructor': 0,
   },
 };
