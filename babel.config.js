@@ -1,5 +1,5 @@
 module.exports = {
-  plugins: ['emotion'],
+  plugins: ['emotion', '@babel/plugin-proposal-class-properties'],
   presets: ['@babel/preset-env', '@babel/preset-react'],
   env: {
     production: {

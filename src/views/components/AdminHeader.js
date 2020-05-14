@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 
 import {
   navLink,
@@ -17,26 +17,30 @@ const AdminHeader = () => {
     <header className={siteHeader}>
       <div className={navWrapper}>
         <div>
-          <img src="images/haven-logo.jpg" alt="Haven Development Logo" />
+          <img src="/images/haven-logo.jpg" alt="Haven Development Logo" />
         </div>
 
         <div className={navItemsWrapper}>
           <nav>
             <ul className={navList}>
               <li>
-                <Link className={navLink} to="/admin">
+                <NavLink activeClassName="active" className={navLink} exact to={`${match.url}`}>
                   Overview
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link className={navLink} to={`${match.url}/manage-options`}>
+                <NavLink
+                  activeClassName="active"
+                  className={navLink}
+                  to={`${match.url}/manage-options`}
+                >
                   Manage Options
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link className={navLink} to="/admin">
+                <NavLink activeClassName="active" className={navLink} to="/manage-users">
                   Manage Users
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </nav>
