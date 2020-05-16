@@ -4,31 +4,30 @@ import { cx } from 'react-emotion';
 
 import { styles } from '../../constants';
 
-export const RadioInput = ({ className, label, name, onChange, value }) => {
+export const CheckboxInput = ({ className, label, onClick, value }) => {
   return (
     <div className={cx(styles.radioContainer, className)}>
       <label className={styles.radioLabel} htmlFor={value}>
-        <input id={value} name={name} onChange={onChange} type="radio" value={value} />
+        <input id={value} key={value} onClick={onClick} type="checkbox" value={value} />
         {label && <span>{label}</span>}
       </label>
     </div>
   );
 };
 
-RadioInput.defaultProps = {
+CheckboxInput.defaultProps = {
   className: '',
   label: '',
 };
 
-RadioInput.propTypes = {
+CheckboxInput.propTypes = {
   className: string,
   label: string,
-  name: string.isRequired,
-  onChange: func.isRequired,
+  onClick: func.isRequired,
   value: string.isRequired,
 };
 
-const RadioGroup = ({ children, className, label }) => {
+const CheckboxGroup = ({ children, className, label }) => {
   return (
     <div className={cx(styles.radioGroup, className)}>
       <div className={styles.label}>{label}</div>
@@ -37,15 +36,15 @@ const RadioGroup = ({ children, className, label }) => {
   );
 };
 
-RadioGroup.defaultProps = {
+CheckboxGroup.defaultProps = {
   className: '',
   label: '',
 };
 
-RadioGroup.propTypes = {
+CheckboxGroup.propTypes = {
   className: string,
   children: arrayOf(node).isRequired,
   label: string,
 };
 
-export default RadioGroup;
+export default CheckboxGroup;

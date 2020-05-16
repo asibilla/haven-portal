@@ -7,7 +7,7 @@ import { styles } from '../../constants';
 const TextInput = ({ className, labelText, onChange, placeholder, type, value }) => {
   return (
     <label htmlFor={placeholder}>
-      {labelText && `${labelText}`}
+      {labelText && <div className={styles.label}>{labelText}</div>}
       <input
         id={placeholder}
         className={cx(styles.textInput, className)}

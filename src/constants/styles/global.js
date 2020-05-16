@@ -79,13 +79,16 @@ export const positonRelative = css`
   position: relative;
 `;
 
+export const radioContainer = css`
+  margin-bottom: 4px;
+`;
+
 export const radioGroup = css`
   margin-bottom: 15px;
 `;
 
 export const radioLabel = css`
   cursor: pointer;
-  margin-bottom: 2px;
   span {
     position: relative;
     top: -2px;
@@ -99,6 +102,7 @@ export const scalableImage = css`
 
 export const selectInput = css`
   border: 1px solid ${darkGrey};
+  border-radius: 5px;
   display: block;
   margin-bottom: 15px;
   max-width: 400px;
@@ -152,7 +156,7 @@ export const textInput = css`
   border: solid 1px ${darkGrey};
   border-radius: 5px;
   margin-bottom: 15px;
-  padding: 8px 15px;
+  padding: 8px 10px;
   width: 100%;
 `;
 

@@ -11,5 +11,6 @@ export const formContainer = cx(
 );
 
 export const formSection = css`
+  padding: 0 15px;
   width: 50%;
 `;
