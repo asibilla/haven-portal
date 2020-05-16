@@ -4,6 +4,7 @@ import { black, darkGrey, flexRow, white } from './global';
 
 export const content = css`
   border: 1px solid ${darkGrey};
+  min-height: 60vh;
   padding: 20px;
 `;
 
