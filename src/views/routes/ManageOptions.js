@@ -10,6 +10,7 @@ import {
   DropdownOption,
   RadioGroup,
   RadioInput,
+  TextArea,
   TextInput,
 } from '../components';
 
@@ -18,6 +19,10 @@ const ManageOptionsComponent = () => {
   const [name, setName] = useState('');
   const [level, setLevel] = useState('base');
   const [location, setLocation] = useState([]);
+  const [sellPrice, setSellPrice] = useState('');
+  const [contractorPrice, setContractorPrice] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [extendedDescription, setExtendedDescription] = useState('');
   // state will be active tab, db data
   // scan db once edit tab is activated (start on add)
   // after updating, from edit, redirect to add and refresh.
@@ -124,8 +129,33 @@ const ManageOptionsComponent = () => {
                 value="recroom"
               />
             </CheckboxGroup>
+
+            <TextInput
+              labelText="Sell Price:"
+              onChange={setValue(setSellPrice)}
+              placeholder="0"
+              value={sellPrice}
+            />
+
+            <TextInput
+              labelText="Contractor Price:"
+              onChange={setValue(setContractorPrice)}
+              placeholder="0"
+              value={contractorPrice}
+            />
           </div>
-          <div className={formSection}>More from elements</div>
+          <div className={formSection}>
+            <TextArea
+              labelText="Product Description"
+              onChange={setValue(setProductDescription)}
+              value={productDescription}
+            />
+            <TextArea
+              labelText="Extended Description"
+              onChange={setValue(setExtendedDescription)}
+              value={extendedDescription}
+            />
+          </div>
         </form>
       </div>
     </div>

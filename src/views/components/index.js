@@ -8,6 +8,7 @@ export { default as CheckboxGroup } from './CheckboxGroup';
 export { default as DropdownMenu } from './DropdownMenu';
 export { default as RadioGroup } from './RadioGroup';
 export { default as SignOutButton } from './SignOutButton';
+export { default as TextArea } from './TextArea';
 export { default as TextInput } from './TextInput';
 export { default as ViewWrapper } from './ViewWrapper';
 
