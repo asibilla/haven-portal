@@ -1,10 +1,15 @@
 import { css, cx } from 'react-emotion';
-import { flexRow, large } from './global';
+import { desktop, flexRow } from './global';
 
-export const formSection = cx(
+export const formContainer = cx(
   css`
-    ${large} {
+    ${desktop} {
       ${flexRow}
+      align-items: flex-start;
     }
   `
 );
+
+export const formSection = css`
+  width: 50%;
+`;

@@ -71,11 +71,25 @@ export const flexRow = css`
 `;
 
 export const label = css`
+  font-weight: 600;
   margin-bottom: 5px;
 `;
 
 export const positonRelative = css`
   position: relative;
+`;
+
+export const radioGroup = css`
+  margin-bottom: 15px;
+`;
+
+export const radioLabel = css`
+  cursor: pointer;
+  margin-bottom: 2px;
+  span {
+    position: relative;
+    top: -2px;
+  }
 `;
 
 export const scalableImage = css`
