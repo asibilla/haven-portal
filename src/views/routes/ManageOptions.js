@@ -1,15 +1,23 @@
+import { bool } from 'prop-types';
 import React from 'react';
 
+import OptionsForm from '../components/OptionsForm';
 import withTabset from '../hocs/withTabset';
 
-import OptionsForm from '../components/OptionsForm';
-
-const ManageOptionsComponent = () => {
-  return (
-    <div>
-      <OptionsForm />
-    </div>
-  );
+const ManageOptionsComponent = ({ addNewIsActive }) => {
+  return <div>{addNewIsActive && <OptionsForm />}</div>;
 };
 
-export default withTabset({ WrappedComponent: ManageOptionsComponent, tableName: 'options' });
+ManageOptionsComponent.defaultProps = {
+  addNewIsActive: false,
+};
+
+ManageOptionsComponent.propTypes = {
+  addNewIsActive: bool,
+};
+
+export default withTabset({
+  displayKey: 'name',
+  tableName: 'options',
+  WrappedComponent: ManageOptionsComponent,
+});
