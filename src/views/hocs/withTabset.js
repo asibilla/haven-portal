@@ -1,4 +1,4 @@
-import { node } from 'prop-types';
+import { func } from 'prop-types';
 import React, { Component } from 'react';
 import { cx } from 'react-emotion';
 
@@ -64,7 +64,7 @@ class Tabset extends Component {
 }
 
 Tabset.propTypes = {
-  WrappedComponent: node.isRequired,
+  WrappedComponent: func.isRequired,
 };
 
 const withTabset = (props) => {
