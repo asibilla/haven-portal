@@ -4,7 +4,6 @@ import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
 import { routes, styles } from '../../constants';
 import { getJwt, isAdmin } from '../../helpers/auth';
-// import { scanDB } from '../../helpers/db';
 import AppContext from '../../helpers/context';
 import { AdminHeader } from '../components';
 import AdminOverview from './AdminOverview';
@@ -23,10 +22,6 @@ const AdminHome = ({ url }) => {
       if (!isAdmin(authData)) {
         history.push(routes.userSignIn);
       }
-      // const query = await scanDB({
-      //   authData,
-      //   tableName: 'options',
-      // });
     })();
   }, [url]);
 

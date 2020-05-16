@@ -1,4 +1,4 @@
-import { arrayOf, func, node, string } from 'prop-types';
+import { arrayOf, func, node, oneOfType, string } from 'prop-types';
 import React from 'react';
 import { cx } from 'react-emotion';
 
@@ -40,7 +40,7 @@ DropdownMenu.defaultProps = {
 DropdownMenu.propTypes = {
   id: string.isRequired,
   className: string,
-  children: arrayOf(node).isRequired,
+  children: oneOfType([node, arrayOf(node)]).isRequired,
   label: string,
   labelClassName: string,
   onChange: func.isRequired,
