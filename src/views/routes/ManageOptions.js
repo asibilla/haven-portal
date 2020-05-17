@@ -1,4 +1,4 @@
-import { bool, shape } from 'prop-types';
+import { bool, func, shape } from 'prop-types';
 import React from 'react';
 
 import OptionsForm from '../components/OptionsForm';
@@ -6,10 +6,10 @@ import OptionsView from '../components/OptionsView';
 import { optionPropType } from '../../constants/propTypeObjects';
 import withTabset from '../hocs/withTabset';
 
-const ManageOptionsComponent = ({ addNewIsActive, selectedItem }) => {
+const ManageOptionsComponent = ({ addNewIsActive, refreshData, selectedItem }) => {
   return (
     <div>
-      {addNewIsActive && <OptionsForm />}
+      {addNewIsActive && <OptionsForm refreshData={refreshData} />}
       {!addNewIsActive && selectedItem && <OptionsView selectedItem={selectedItem} />}
     </div>
   );
@@ -22,6 +22,7 @@ ManageOptionsComponent.defaultProps = {
 
 ManageOptionsComponent.propTypes = {
   addNewIsActive: bool,
+  refreshData: func.isRequired,
   selectedItem: shape(optionPropType),
 };
 

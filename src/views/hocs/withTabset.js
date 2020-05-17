@@ -28,22 +28,13 @@ class Tabset extends Component {
   constructor(props) {
     super(props);
 
+    this.refreshData = this.refreshData.bind(this);
     this.updateSelectedItem = this.updateSelectedItem.bind(this);
     this.updateSelectedItemKey = this.updateSelectedItemKey.bind(this);
   }
 
-  async componentDidMount() {
-    const { authData } = this.context;
-    const { tableName } = this.props;
-    try {
-      const data = await scanDB({
-        authData,
-        tableName,
-      });
-      this.setState({ dataItems: data.Items });
-    } catch (e) {
-      this.setState({ dbError: `An error occured: ${e.message}` });
-    }
+  componentDidMount() {
+    this.refreshData();
   }
 
   getTabState(tabName) {
@@ -52,6 +43,29 @@ class Tabset extends Component {
       return 'active';
     }
     return '';
+  }
+
+  async refreshData() {
+    const { authData } = this.context;
+    const { tableName } = this.props;
+
+    this.setState(
+      {
+        dataItems: [],
+        dbError: null,
+      },
+      async () => {
+        try {
+          const data = await scanDB({
+            authData,
+            tableName,
+          });
+          this.setState({ dataItems: data.Items });
+        } catch (e) {
+          this.setState({ dbError: `An error occured: ${e.message}` });
+        }
+      }
+    );
   }
 
   updateTabState(tabName) {
@@ -124,7 +138,11 @@ class Tabset extends Component {
               })}
             </DropdownMenu>
           )}
-          <WrappedComponent addNewIsActive={addNewIsActive} selectedItem={selectedItem} />
+          <WrappedComponent
+            addNewIsActive={addNewIsActive}
+            refreshData={this.refreshData}
+            selectedItem={selectedItem}
+          />
         </div>
       </>
     );

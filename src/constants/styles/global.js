@@ -33,6 +33,7 @@ export const black = '#000';
 export const darkGrey = '#5B5C5E';
 export const lightGrey = '#a3a3a3';
 export const redError = '#b22222';
+export const greenSuccess = '#008000';
 export const white = '#fff';
 
 /**
@@ -50,6 +51,11 @@ export const button = css`
   font-weight: 600;
   min-width: 125px;
   padding: 12px 15px;
+
+  &:disabled {
+    background-color: ${lightGrey};
+    border: 1px solid ${lightGrey};
+  }
 `;
 
 export const contentSection = css`
@@ -58,6 +64,11 @@ export const contentSection = css`
 
 export const errorText = css`
   color: ${redError};
+  margin-bottom: 8px;
+`;
+
+export const fieldInstructions = css`
+  font-size: 12px;
   margin-bottom: 8px;
 `;
 
@@ -146,6 +157,12 @@ export const selectInput = css`
     border-width: 8px 6.5px 0 6.5px;
     top: 55%;
   }
+`;
+
+export const successText = css`
+  color: ${greenSuccess};
+  padding: 8px;
+  text-align: center;
 `;
 
 export const textAlignLeft = css`
