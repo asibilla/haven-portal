@@ -92,11 +92,42 @@ export const queryDB = async ({ authData, queryItems, tableName }) => {
   }
 };
 
-export const putItem = async ({ authData, query }) => {
+export const putItem = async ({ authData, item, tableName }) => {
+  const query = {
+    TableName: tableName,
+    Item: {
+      ...item,
+    },
+  };
+
   try {
     const docClient = await getDocClient(authData);
     return new Promise((resolve, reject) => {
       docClient.put(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const deleteItem = async ({ authData, tableName, item }) => {
+  const query = {
+    TableName: tableName,
+    Key: {
+      ...item,
+    },
+  };
+
+  try {
+    const docClient = await getDocClient(authData);
+    return new Promise((resolve, reject) => {
+      docClient.delete(query, (err, data) => {
         if (err) {
           reject(err);
         } else {

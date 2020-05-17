@@ -28,6 +28,7 @@ ManageOptionsComponent.propTypes = {
 
 export default withTabset({
   displayKey: 'name',
+  primaryKey: 'id',
   tableName: 'options',
   WrappedComponent: ManageOptionsComponent,
 });

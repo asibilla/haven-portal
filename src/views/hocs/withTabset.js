@@ -7,7 +7,7 @@ import { styles } from '../../constants';
 import { content, tab, tabset } from '../../constants/styles/tabset';
 
 import AppContext from '../../helpers/context';
-import { scanDB } from '../../helpers/db';
+import { deleteItem, scanDB } from '../../helpers/db';
 
 import { DropdownMenu, DropdownOption } from '../components';
 
@@ -23,11 +23,13 @@ class Tabset extends Component {
     dbError: null,
     selectedItem: null,
     selectedItemKey: '',
+    successMessage: '',
   };
 
   constructor(props) {
     super(props);
 
+    this.deleteItem = this.deleteItem.bind(this);
     this.refreshData = this.refreshData.bind(this);
     this.updateSelectedItem = this.updateSelectedItem.bind(this);
     this.updateSelectedItemKey = this.updateSelectedItemKey.bind(this);
@@ -37,12 +39,50 @@ class Tabset extends Component {
     this.refreshData();
   }
 
+  get editDeleteBlock() {
+    return (
+      <div>
+        <a href="#edit">Edit</a>
+        <span> | </span>
+        <a href="#delete" onClick={this.deleteItem}>
+          Delete
+        </a>
+      </div>
+    );
+  }
+
   getTabState(tabName) {
     const { addNewIsActive } = this.state;
     if ((tabName === ADD_NEW && addNewIsActive) || (tabName === MANAGE && !addNewIsActive)) {
       return 'active';
     }
     return '';
+  }
+
+  async deleteItem() {
+    const { authData } = this.context;
+    const { primaryKey, tableName } = this.props;
+    const { selectedItem } = this.state;
+    if (
+      window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')
+    ) {
+      const item = {
+        optionType: get(selectedItem, 'optionType', null),
+        [primaryKey]: get(selectedItem, primaryKey, null),
+      };
+
+      try {
+        await deleteItem({ authData, item, tableName });
+        this.setState({
+          selectedItem: null,
+          selectedItemKey: '',
+          successMessage: 'Your item was successfully deleted',
+        });
+        this.refreshData();
+      } catch (e) {
+        this.setState({ dbError: `Something went wrong: ${e.message}` });
+      }
+    }
   }
 
   async refreshData() {
@@ -84,7 +124,7 @@ class Tabset extends Component {
 
     const selectedItem =
       dataItems.find((item) => get(item, displayKey, '') === selectedItemKey) || null;
-    this.setState({ selectedItem });
+    this.setState({ dbError: null, selectedItem, successMessage: '' });
   }
 
   updateSelectedItemKey(e) {
@@ -95,7 +135,14 @@ class Tabset extends Component {
 
   render() {
     const { displayKey, WrappedComponent } = this.props;
-    const { addNewIsActive, dataItems, dbError, selectedItem, selectedItemKey } = this.state;
+    const {
+      addNewIsActive,
+      dataItems,
+      dbError,
+      selectedItem,
+      selectedItemKey,
+      successMessage,
+    } = this.state;
 
     return (
       <>
@@ -120,7 +167,9 @@ class Tabset extends Component {
           </div>
         </div>
         <div className={content}>
-          {dbError && <p className={styles.errorText}>{dbError}</p>}
+          <div className={styles.messageContainer}>
+            {dbError && <p className={styles.errorText}>{dbError}</p>}
+          </div>
           {!addNewIsActive && (
             <DropdownMenu
               id="item-select"
@@ -138,6 +187,10 @@ class Tabset extends Component {
               })}
             </DropdownMenu>
           )}
+          <div className={styles.messageContainer}>
+            {successMessage && <p className={styles.successText}>{successMessage}</p>}
+          </div>
+          {selectedItem && this.editDeleteBlock}
           <WrappedComponent
             addNewIsActive={addNewIsActive}
             refreshData={this.refreshData}
@@ -151,6 +204,7 @@ class Tabset extends Component {
 
 Tabset.propTypes = {
   displayKey: string.isRequired,
+  primaryKey: string.isRequired,
   tableName: string.isRequired,
   WrappedComponent: func.isRequired,
 };

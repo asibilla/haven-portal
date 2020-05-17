@@ -82,24 +82,21 @@ const OptionsForm = ({ refreshData, url }) => {
 
     // Add validation
 
-    const dbQuery = {
-      TableName: 'options',
-      Item: {
-        contractorPrice: Number(contractorPrice),
-        extendedDescription,
-        features: textAreaToArray(features),
-        id: v4(),
-        level,
-        location,
-        name,
-        optionType,
-        productDescription,
-        sellPrice: Number(sellPrice),
-      },
+    const item = {
+      contractorPrice: Number(contractorPrice),
+      extendedDescription,
+      features: textAreaToArray(features),
+      id: v4(),
+      level,
+      location,
+      name,
+      optionType,
+      productDescription,
+      sellPrice: Number(sellPrice),
     };
 
     try {
-      await putItem({ authData, query: dbQuery });
+      await putItem({ authData, item, tableName: 'options' });
       setSubmitSuccess('Your option has been added!');
       clearState();
       refreshData();

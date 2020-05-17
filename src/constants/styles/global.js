@@ -86,6 +86,10 @@ export const label = css`
   margin-bottom: 5px;
 `;
 
+export const messageContainer = css`
+  min-height: 32px;
+`;
+
 export const positonRelative = css`
   position: relative;
 `;
