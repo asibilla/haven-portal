@@ -45,5 +45,12 @@ export const optionsViewContainer = css`
   .title {
     font-weight: 600;
     margin-right: 5px;
+    min-width: 120px;
+  }
+  .value {
+    ul {
+      margin: 0;
+      padding-left: 0;
+    }
   }
 `;
