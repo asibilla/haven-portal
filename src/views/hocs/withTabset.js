@@ -35,6 +35,7 @@ class Tabset extends Component {
     this.showEditView = this.showEditView.bind(this);
     this.updateSelectedItem = this.updateSelectedItem.bind(this);
     this.updateSelectedItemKey = this.updateSelectedItemKey.bind(this);
+    this.updateSuccessMessage = this.updateSuccessMessage.bind(this);
   }
 
   componentDidMount() {
@@ -44,7 +45,7 @@ class Tabset extends Component {
   get editDeleteBlock() {
     return (
       <div>
-        <a href="#edit" onClick={this.showEditView}>
+        <a href="#edit" onClick={this.showEditView(true)}>
           Edit
         </a>
         <span> | </span>
@@ -137,8 +138,12 @@ class Tabset extends Component {
     });
   }
 
+  updateSuccessMessage(message) {
+    this.setState({ successMessage: message });
+  }
+
   showEditView(shouldShow = true) {
-    this.setState({ editIsActive: shouldShow });
+    return () => this.setState({ editIsActive: shouldShow });
   }
 
   render() {
@@ -206,6 +211,7 @@ class Tabset extends Component {
             refreshData={this.refreshData}
             selectedItem={selectedItem}
             showEditView={this.showEditView}
+            updateSuccessMessage={this.updateSuccessMessage}
           />
         </div>
       </>

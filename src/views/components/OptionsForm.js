@@ -1,3 +1,4 @@
+import { noop } from 'lodash';
 import { func, shape, string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
@@ -6,7 +7,7 @@ import { styles } from '../../constants';
 import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import AppContext from '../../helpers/context';
-import { putItem } from '../../helpers/db';
+import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 
 import {
   Button,
@@ -24,13 +25,13 @@ const lineBreakRegEx = /\r?\n|\r/;
 
 const textAreaToArray = (text) => text.split(lineBreakRegEx);
 
-const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
+const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMessage, url }) => {
   const { authData } = useContext(AppContext);
 
   const [optionType, setOptionType] = useState('finish');
-  const [name, setName] = useState('');
-  const [level, setLevel] = useState('base');
-  const [location, setLocation] = useState([]);
+  const [productName, setName] = useState('');
+  const [productLevel, setLevel] = useState('base');
+  const [productLocation, setLocation] = useState([]);
   const [sellPrice, setSellPrice] = useState('');
   const [contractorPrice, setContractorPrice] = useState('');
   const [productDescription, setProductDescription] = useState('');
@@ -45,10 +46,11 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
   useEffect(() => {
     if (selectedItem) {
       setOptionType(selectedItem.optionType);
-      setName(selectedItem.name);
-      setLevel(selectedItem.level);
-      setSellPrice(selectedItem.sellPrice);
-      setContractorPrice(selectedItem.contractorPrice);
+      setName(selectedItem.productName);
+      setLevel(selectedItem.productLevel);
+      setLocation(selectedItem.productLocation);
+      setSellPrice((selectedItem.sellPrice || 0).toString());
+      setContractorPrice((selectedItem.contractorPrice || 0).toString());
       setProductDescription(selectedItem.productDescription);
       setExtendedDescription(selectedItem.extendedDescription);
       setFeatures(selectedItem.features.join('\n'));
@@ -74,6 +76,10 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
     };
   };
 
+  const getIsChecked = (value) => {
+    return productLocation.indexOf(value) > -1;
+  };
+
   const clearState = () => {
     setOptionType('finish');
     setName('');
@@ -94,45 +100,75 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
     // Add validation
 
     const id = selectedItem ? selectedItem.id : v4();
-    const item = {
-      contractorPrice: Number(contractorPrice),
-      extendedDescription,
-      features: textAreaToArray(features),
-      id,
-      level,
-      location,
-      name,
-      optionType,
-      productDescription,
-      sellPrice: Number(sellPrice),
-    };
 
-    try {
-      await putItem({ authData, item, tableName: 'options' });
-      setSubmitSuccess('Your option has been added!');
-      clearState();
-      refreshData();
-    } catch (err) {
-      setSubmitError(`An error occured: `, err.message);
+    if (selectedItem) {
+      const queryItems = [
+        new DBQueryItem({ id: ':a', key: 'contractorPrice', value: Number(contractorPrice) }),
+        new DBQueryItem({ id: ':b', key: 'extendedDescription', value: extendedDescription }),
+        new DBQueryItem({ id: ':c', key: 'features', value: textAreaToArray(features) }),
+        new DBQueryItem({ id: ':d', key: 'productLevel', value: productLevel }),
+        new DBQueryItem({ id: ':e', key: 'productLocation', value: productLocation }),
+        new DBQueryItem({ id: ':f', key: 'productName', value: productName }),
+        new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription }),
+        new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice) }),
+        new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials) }),
+      ];
+
+      const keyItems = {
+        id,
+        optionType,
+      };
+
+      try {
+        await updateItem({ authData, items: queryItems, keyItems, tableName: 'options' });
+        updateSuccessMessage('Option successfully updated!');
+        await refreshData();
+        showEditView(false)();
+      } catch (err) {
+        setSubmitError(`An error occured: `, err.message);
+      }
+    } else {
+      const item = {
+        contractorPrice: Number(contractorPrice),
+        extendedDescription,
+        features: textAreaToArray(features),
+        id,
+        productLevel,
+        productLocation,
+        productName,
+        materials: textAreaToArray(materials),
+        optionType,
+        productDescription,
+        sellPrice: Number(sellPrice),
+      };
+
+      try {
+        await putItem({ authData, item, tableName: 'options' });
+        setSubmitSuccess('Your option has been added!');
+        clearState();
+        refreshData();
+      } catch (err) {
+        setSubmitError(`An error occured: `, err.message);
+      }
+      setButtonIsDisabled(false);
     }
-    setButtonIsDisabled(false);
   };
-
-  const handleCancel = () => showEditView(false);
 
   return (
     <div className="form-container">
-      <h3>Add a New Option</h3>
+      <h3>{selectedItem ? 'Edit Option' : 'Add a New Option'}</h3>
       <form className={formContainer} onSubmit={handleSubmit}>
         <div className={formSection}>
           <RadioGroup label="Option Type:" value={optionType}>
             <RadioInput
+              checked={optionType === 'finish'}
               label="Finish"
               name="option-type"
               onChange={setValue(setOptionType)}
               value="finish"
             />
             <RadioInput
+              checked={optionType === 'structural'}
               label="Structural"
               name="option-type"
               onChange={setValue(setOptionType)}
@@ -140,9 +176,14 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
             />
           </RadioGroup>
 
-          <TextInput labelText="Name:" onChange={setValue(setName)} value={name} />
+          <TextInput labelText="Name:" onChange={setValue(setName)} value={productName} />
 
-          <DropdownMenu id="level" label="Level:" onChange={setValue(setLevel)} value={level}>
+          <DropdownMenu
+            id="productLevel"
+            label="Level:"
+            onChange={setValue(setLevel)}
+            value={productLevel}
+          >
             <DropdownOption text="Base" value="base" />
             <DropdownOption text="Level 1" value="level1" />
             <DropdownOption text="Level 2" value="level2" />
@@ -153,53 +194,73 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
 
           <CheckboxGroup label="Location:">
             <CheckboxInput
+              checked={getIsChecked('bar')}
               label="Bar"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bar"
             />
             <CheckboxInput
+              checked={getIsChecked('bath1')}
               label="Bath 1"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bath1"
             />
             <CheckboxInput
+              checked={getIsChecked('bath2')}
               label="Bath 2"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bath2"
             />
             <CheckboxInput
+              checked={getIsChecked('bath3')}
               label="Bath 3"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bath3"
             />
             <CheckboxInput
+              checked={getIsChecked('bath4')}
               label="Bath 4"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bath4"
             />
             <CheckboxInput
+              checked={getIsChecked('bath5')}
               label="Bath 5"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="bath5"
             />
             <CheckboxInput
+              checked={getIsChecked('kitchen')}
               label="Kitchen"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="kitchen"
             />
             <CheckboxInput
+              checked={getIsChecked('laundry')}
               label="Laundry"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="laundry"
             />
             <CheckboxInput
+              checked={getIsChecked('powder')}
               label="Poweder"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="powder"
             />
             <CheckboxInput
+              checked={getIsChecked('recroom')}
               label="Rec Room"
-              onClick={setCheckboxValues(location, setLocation)}
+              onChange={noop}
+              onClick={setCheckboxValues(productLocation, setLocation)}
               value="recroom"
             />
           </CheckboxGroup>
@@ -254,7 +315,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
               <Button
                 className={styles.buttonSecondary}
                 disabled={buttonIsDisabled}
-                onClick={handleCancel}
+                onClick={showEditView(false)}
                 text="Cancel"
               />
             )}
@@ -270,13 +331,16 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
 
 OptionsForm.defaultProps = {
   selectedItem: null,
+  showEditView: noop,
+  updateSuccessMessage: noop,
   url: '',
 };
 
 OptionsForm.propTypes = {
   refreshData: func.isRequired,
   selectedItem: shape(optionPropType),
-  showEditView: func.isRequired,
+  showEditView: func,
+  updateSuccessMessage: func,
   url: string,
 };
 

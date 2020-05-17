@@ -34,7 +34,6 @@ export const scanDB = async ({ authData, tableName }) => {
   }
 };
 
-// TODO: expand class for more than just equality condition expressions.
 export class DBQueryItem {
   constructor({ id, key, value }) {
     this.id = id;
@@ -43,6 +42,10 @@ export class DBQueryItem {
   }
 
   get keyConditionExpression() {
+    return `${this.key} = ${this.id}`;
+  }
+
+  get updateExpression() {
     return `${this.key} = ${this.id}`;
   }
 
@@ -128,6 +131,48 @@ export const deleteItem = async ({ authData, tableName, item }) => {
     const docClient = await getDocClient(authData);
     return new Promise((resolve, reject) => {
       docClient.delete(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const createUpdateQuery = ({ items, keyItems, tableName }) => {
+  let expression = 'set ';
+  let attributes = {};
+  forEach(items, (item, index) => {
+    expression += item.updateExpression;
+    if (items.length > index + 1) {
+      expression += ', ';
+    }
+    attributes = {
+      ...attributes,
+      ...item.expressionAttributeValue,
+    };
+  });
+
+  return {
+    TableName: tableName,
+    Key: {
+      ...keyItems,
+    },
+    UpdateExpression: expression,
+    ExpressionAttributeValues: attributes,
+  };
+};
+
+export const updateItem = async ({ authData, items, keyItems, tableName }) => {
+  const query = createUpdateQuery({ items, keyItems, tableName });
+  try {
+    const docClient = await getDocClient(authData);
+    return new Promise((resolve, reject) => {
+      docClient.update(query, (err, data) => {
         if (err) {
           reject(err);
         } else {

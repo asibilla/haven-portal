@@ -12,6 +12,7 @@ const ManageOptionsComponent = ({
   refreshData,
   selectedItem,
   showEditView,
+  updateSuccessMessage,
 }) => {
   return (
     <div>
@@ -24,6 +25,7 @@ const ManageOptionsComponent = ({
           selectedItem={selectedItem}
           refreshData={refreshData}
           showEditView={showEditView}
+          updateSuccessMessage={updateSuccessMessage}
         />
       )}
     </div>
@@ -42,10 +44,11 @@ ManageOptionsComponent.propTypes = {
   refreshData: func.isRequired,
   selectedItem: shape(optionPropType),
   showEditView: func.isRequired,
+  updateSuccessMessage: func.isRequired,
 };
 
 export default withTabset({
-  displayKey: 'name',
+  displayKey: 'productName',
   primaryKey: 'id',
   tableName: 'options',
   WrappedComponent: ManageOptionsComponent,
