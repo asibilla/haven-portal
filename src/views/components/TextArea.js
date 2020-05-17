@@ -8,7 +8,7 @@ const TextInput = ({ className, instructions, labelText, onChange, placeholder, 
   return (
     <label htmlFor={placeholder}>
       {labelText && <div className={styles.label}>{labelText}</div>}
-      {instructions && <div className="instruct">{instructions}</div>}
+      {instructions && <div className={styles.fieldInstructions}>{instructions}</div>}
       <textarea
         id={placeholder}
         className={cx(styles.textInput, className)}
