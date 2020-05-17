@@ -21,6 +21,7 @@ class Tabset extends Component {
     addNewIsActive: false,
     dataItems: [],
     dbError: null,
+    editIsActive: false,
     selectedItem: null,
     selectedItemKey: '',
     successMessage: '',
@@ -31,6 +32,7 @@ class Tabset extends Component {
 
     this.deleteItem = this.deleteItem.bind(this);
     this.refreshData = this.refreshData.bind(this);
+    this.showEditView = this.showEditView.bind(this);
     this.updateSelectedItem = this.updateSelectedItem.bind(this);
     this.updateSelectedItemKey = this.updateSelectedItemKey.bind(this);
   }
@@ -42,7 +44,9 @@ class Tabset extends Component {
   get editDeleteBlock() {
     return (
       <div>
-        <a href="#edit">Edit</a>
+        <a href="#edit" onClick={this.showEditView}>
+          Edit
+        </a>
         <span> | </span>
         <a href="#delete" onClick={this.deleteItem}>
           Delete
@@ -133,12 +137,17 @@ class Tabset extends Component {
     });
   }
 
+  showEditView(shouldShow = true) {
+    this.setState({ editIsActive: shouldShow });
+  }
+
   render() {
     const { displayKey, WrappedComponent } = this.props;
     const {
       addNewIsActive,
       dataItems,
       dbError,
+      editIsActive,
       selectedItem,
       selectedItemKey,
       successMessage,
@@ -170,7 +179,7 @@ class Tabset extends Component {
           <div className={styles.messageContainer}>
             {dbError && <p className={styles.errorText}>{dbError}</p>}
           </div>
-          {!addNewIsActive && (
+          {!addNewIsActive && !editIsActive && (
             <DropdownMenu
               id="item-select"
               onChange={this.updateSelectedItemKey}
@@ -190,11 +199,13 @@ class Tabset extends Component {
           <div className={styles.messageContainer}>
             {successMessage && <p className={styles.successText}>{successMessage}</p>}
           </div>
-          {selectedItem && this.editDeleteBlock}
+          {selectedItem && !editIsActive && !addNewIsActive && this.editDeleteBlock}
           <WrappedComponent
             addNewIsActive={addNewIsActive}
+            editIsActive={editIsActive}
             refreshData={this.refreshData}
             selectedItem={selectedItem}
+            showEditView={this.showEditView}
           />
         </div>
       </>
