@@ -26,10 +26,6 @@ const OptionsForm = () => {
   const [features, setFeatures] = useState('');
   const [materials, setMaterials] = useState('');
 
-  // state will be active tab, db data
-  // scan db once edit tab is activated (start on add)
-  // after updating, from edit, redirect to add and refresh.
-
   const setValue = (setState) => {
     return (e) => {
       setState(e.target.value);

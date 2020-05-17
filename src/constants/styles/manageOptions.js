@@ -18,6 +18,32 @@ export const formContainer = cx(
 );
 
 export const formSection = css`
-  padding: 0 15px;
-  width: calc(50% - 35px);
+  ${desktop} {
+    padding: 0 15px;
+    width: calc(50% - 35px);
+  }
+`;
+
+export const optionsViewContainer = css`
+  padding-top: 20px;
+  ${desktop} {
+    ${flexRow}
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .section {
+      padding: 0 15px;
+      width: calc(50% - 35px);
+    }
+  }
+  .group {
+    ${flexRow}
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+  }
+  .title {
+    font-weight: 600;
+    margin-right: 5px;
+  }
 `;
