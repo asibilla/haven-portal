@@ -15,17 +15,30 @@ const OptionsView = ({ selectedItem }) => {
           </div>
         )}
 
-        {selectedItem.name && (
+        {selectedItem.productName && (
           <div className="group">
             <div className="title">Name:</div>
-            <div className="value">{selectedItem.name}</div>
+            <div className="value">{selectedItem.productName}</div>
           </div>
         )}
 
-        {selectedItem.level && (
+        {selectedItem.productLevel && (
           <div className="group">
             <div className="title">Level:</div>
-            <div className="value">{selectedItem.level}</div>
+            <div className="value">{selectedItem.productLevel}</div>
+          </div>
+        )}
+
+        {selectedItem.productLocation && (
+          <div className="group">
+            <div className="title">Locations:</div>
+            <div className="value">
+              <ul>
+                {selectedItem.productLocation.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
@@ -58,7 +71,7 @@ const OptionsView = ({ selectedItem }) => {
         )}
       </div>
       <div className="section">
-        {selectedItem.features && (
+        {selectedItem.features && Array.isArray(selectedItem.features) && (
           <div className="group">
             <div className="title">Features:</div>
             <div className="value">
