@@ -1,8 +1,9 @@
-import { func, string } from 'prop-types';
+import { func, shape, string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { styles } from '../../constants';
+import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import AppContext from '../../helpers/context';
 import { putItem } from '../../helpers/db';
@@ -23,7 +24,7 @@ const lineBreakRegEx = /\r?\n|\r/;
 
 const textAreaToArray = (text) => text.split(lineBreakRegEx);
 
-const OptionsForm = ({ refreshData, url }) => {
+const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
   const { authData } = useContext(AppContext);
 
   const [optionType, setOptionType] = useState('finish');
@@ -42,7 +43,17 @@ const OptionsForm = ({ refreshData, url }) => {
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
 
   useEffect(() => {
-    // Set form fields for edit
+    if (selectedItem) {
+      setOptionType(selectedItem.optionType);
+      setName(selectedItem.name);
+      setLevel(selectedItem.level);
+      setSellPrice(selectedItem.sellPrice);
+      setContractorPrice(selectedItem.contractorPrice);
+      setProductDescription(selectedItem.productDescription);
+      setExtendedDescription(selectedItem.extendedDescription);
+      setFeatures(selectedItem.features.join('\n'));
+      setMaterials(selectedItem.materials.join('\n'));
+    }
   }, [url]);
 
   const setValue = (setState) => {
@@ -67,7 +78,7 @@ const OptionsForm = ({ refreshData, url }) => {
     setOptionType('finish');
     setName('');
     setLevel('base');
-    setLocation('');
+    setLocation([]);
     setSellPrice('');
     setContractorPrice('');
     setProductDescription('');
@@ -82,11 +93,12 @@ const OptionsForm = ({ refreshData, url }) => {
 
     // Add validation
 
+    const id = selectedItem ? selectedItem.id : v4();
     const item = {
       contractorPrice: Number(contractorPrice),
       extendedDescription,
       features: textAreaToArray(features),
-      id: v4(),
+      id,
       level,
       location,
       name,
@@ -105,6 +117,8 @@ const OptionsForm = ({ refreshData, url }) => {
     }
     setButtonIsDisabled(false);
   };
+
+  const handleCancel = () => showEditView(false);
 
   return (
     <div className="form-container">
@@ -236,6 +250,14 @@ const OptionsForm = ({ refreshData, url }) => {
           />
 
           <div className={buttonContainer}>
+            {selectedItem && (
+              <Button
+                className={styles.buttonSecondary}
+                disabled={buttonIsDisabled}
+                onClick={handleCancel}
+                text="Cancel"
+              />
+            )}
             <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
           </div>
           {submitError && <div className={styles.errorText}>{submitError}</div>}
@@ -247,11 +269,14 @@ const OptionsForm = ({ refreshData, url }) => {
 };
 
 OptionsForm.defaultProps = {
+  selectedItem: null,
   url: '',
 };
 
 OptionsForm.propTypes = {
   refreshData: func.isRequired,
+  selectedItem: shape(optionPropType),
+  showEditView: func.isRequired,
   url: string,
 };
 

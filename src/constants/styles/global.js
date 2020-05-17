@@ -58,6 +58,24 @@ export const button = css`
   }
 `;
 
+export const buttonSecondary = css`
+  background-color: ${white};
+  border: 1px solid ${black};
+  border-radius: 18px;
+  color: ${black};
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 10px;
+  min-width: 125px;
+  padding: 12px 15px;
+
+  &:disabled {
+    background-color: ${lightGrey};
+    border: 1px solid ${lightGrey};
+  }
+`;
+
 export const contentSection = css`
   padding: 0 45px;
 `;
