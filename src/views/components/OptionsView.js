@@ -5,7 +5,6 @@ import { optionsViewContainer } from '../../constants/styles/manageOptions';
 import { optionPropType } from '../../constants/propTypeObjects';
 
 const OptionsView = ({ selectedItem }) => {
-  console.log('selected item', selectedItem);
   return (
     <div className={optionsViewContainer}>
       <div className="section">

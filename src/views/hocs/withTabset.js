@@ -35,13 +35,11 @@ class Tabset extends Component {
   async componentDidMount() {
     const { authData } = this.context;
     const { tableName } = this.props;
-
     try {
       const data = await scanDB({
         authData,
         tableName,
       });
-
       this.setState({ dataItems: data.Items });
     } catch (e) {
       this.setState({ dbError: `An error occured: ${e.message}` });

@@ -1,17 +1,13 @@
-import { arrayOf, number, shape, string } from 'prop-types';
-
-export const tableSet = {
-  values: arrayOf(string),
-};
+import { arrayOf, number, string } from 'prop-types';
 
 export const optionPropType = {
   contractorPrice: number,
   extendedDescription: string,
   id: string,
-  features: shape(tableSet),
+  features: arrayOf(string),
   level: string,
-  location: shape(tableSet),
-  materials: shape(tableSet),
+  location: arrayOf(string),
+  materials: arrayOf(string),
   name: string,
   optionType: string,
   productDescription: string,

@@ -91,3 +91,20 @@ export const queryDB = async ({ authData, queryItems, tableName }) => {
     return Promise.reject(e);
   }
 };
+
+export const putItem = async ({ authData, query }) => {
+  try {
+    const docClient = await getDocClient(authData);
+    return new Promise((resolve, reject) => {
+      docClient.put(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

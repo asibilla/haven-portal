@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import { string } from 'prop-types';
+import React, { useContext, useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 
+import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
+import AppContext from '../../helpers/context';
+import { putItem } from '../../helpers/db';
 
 import {
   Button,
@@ -14,7 +19,12 @@ import {
   TextInput,
 } from '.';
 
-const OptionsForm = () => {
+const lineBreakRegEx = /\r?\n|\r/;
+
+const textAreaToArray = (text) => text.split(lineBreakRegEx);
+
+const OptionsForm = ({ url }) => {
+  const { authData } = useContext(AppContext);
   const [optionType, setOptionType] = useState('finish');
   const [name, setName] = useState('');
   const [level, setLevel] = useState('base');
@@ -25,6 +35,11 @@ const OptionsForm = () => {
   const [extendedDescription, setExtendedDescription] = useState('');
   const [features, setFeatures] = useState('');
   const [materials, setMaterials] = useState('');
+  const [submitError, setSubmitError] = useState(null);
+
+  useEffect(() => {
+    // Set form fields for edit
+  }, [url]);
 
   const setValue = (setState) => {
     return (e) => {
@@ -44,10 +59,39 @@ const OptionsForm = () => {
     };
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Add validation
+
+    const dbQuery = {
+      TableName: 'options',
+      Item: {
+        contractorPrice: Number(contractorPrice),
+        extendedDescription,
+        features: textAreaToArray(features),
+        id: v4(),
+        level,
+        location,
+        name,
+        optionType,
+        productDescription,
+        sellPrice: Number(sellPrice),
+      },
+    };
+
+    try {
+      await putItem({ authData, query: dbQuery });
+      // add success message and refresh data.
+    } catch (err) {
+      setSubmitError(`An error occured: `, err.message);
+    }
+  };
+
   return (
     <div className="form-container">
       <h3>Add a New Option</h3>
-      <form className={formContainer}>
+      <form className={formContainer} onSubmit={handleSubmit}>
         <div className={formSection}>
           <RadioGroup label="Option Type:" value={optionType}>
             <RadioInput
@@ -162,10 +206,19 @@ const OptionsForm = () => {
           <div className={buttonContainer}>
             <Button text="Submit" type="submit" />
           </div>
+          {submitError && <div className={styles.errorText}>{submitError}</div>}
         </div>
       </form>
     </div>
   );
+};
+
+OptionsForm.defaultProps = {
+  url: '',
+};
+
+OptionsForm.propTypes = {
+  url: string,
 };
 
 export default OptionsForm;
