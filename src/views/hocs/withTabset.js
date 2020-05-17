@@ -44,7 +44,7 @@ class Tabset extends Component {
   get editDeleteBlock() {
     return (
       <div>
-        <a href="#edit" onClick={this.showEditView}>
+        <a href="#edit" onClick={this.showEditView(true)}>
           Edit
         </a>
         <span> | </span>
@@ -138,7 +138,7 @@ class Tabset extends Component {
   }
 
   showEditView(shouldShow = true) {
-    this.setState({ editIsActive: shouldShow });
+    return () => this.setState({ editIsActive: shouldShow });
   }
 
   render() {

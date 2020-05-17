@@ -1,14 +1,21 @@
-import { arrayOf, func, node, string } from 'prop-types';
+import { arrayOf, bool, func, node, string } from 'prop-types';
 import React from 'react';
 import { cx } from 'react-emotion';
 
 import { styles } from '../../constants';
 
-export const RadioInput = ({ className, label, name, onChange, value }) => {
+export const RadioInput = ({ checked, className, label, name, onChange, value }) => {
   return (
     <div className={cx(styles.radioContainer, className)}>
       <label className={styles.radioLabel} htmlFor={value}>
-        <input id={value} name={name} onChange={onChange} type="radio" value={value} />
+        <input
+          checked={checked}
+          id={value}
+          name={name}
+          onChange={onChange}
+          type="radio"
+          value={value}
+        />
         {label && <span>{label}</span>}
       </label>
     </div>
@@ -16,11 +23,13 @@ export const RadioInput = ({ className, label, name, onChange, value }) => {
 };
 
 RadioInput.defaultProps = {
+  checked: false,
   className: '',
   label: '',
 };
 
 RadioInput.propTypes = {
+  checked: bool,
   className: string,
   label: string,
   name: string.isRequired,

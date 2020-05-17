@@ -64,7 +64,7 @@ const OptionsView = ({ selectedItem }) => {
             <div className="value">
               <ul>
                 {selectedItem.features.map((feature) => (
-                  <li>{feature}</li>
+                  <li key={feature}>{feature}</li>
                 ))}
               </ul>
             </div>
@@ -77,7 +77,7 @@ const OptionsView = ({ selectedItem }) => {
             <div className="value">
               <ul>
                 {selectedItem.materials.map((material) => (
-                  <li>{material}</li>
+                  <li key={material}>{material}</li>
                 ))}
               </ul>
             </div>

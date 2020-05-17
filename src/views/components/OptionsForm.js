@@ -1,3 +1,4 @@
+import { noop } from 'lodash';
 import { func, shape, string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
@@ -47,8 +48,9 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
       setOptionType(selectedItem.optionType);
       setName(selectedItem.name);
       setLevel(selectedItem.level);
-      setSellPrice(selectedItem.sellPrice);
-      setContractorPrice(selectedItem.contractorPrice);
+      setLocation(selectedItem.location);
+      setSellPrice((selectedItem.sellPrice || 0).toString());
+      setContractorPrice((selectedItem.contractorPrice || 0).toString());
       setProductDescription(selectedItem.productDescription);
       setExtendedDescription(selectedItem.extendedDescription);
       setFeatures(selectedItem.features.join('\n'));
@@ -72,6 +74,10 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
       }
       setState(newState);
     };
+  };
+
+  const getIsChecked = (value) => {
+    return location.indexOf(value) > -1;
   };
 
   const clearState = () => {
@@ -118,8 +124,6 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
     setButtonIsDisabled(false);
   };
 
-  const handleCancel = () => showEditView(false);
-
   return (
     <div className="form-container">
       <h3>Add a New Option</h3>
@@ -127,12 +131,14 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
         <div className={formSection}>
           <RadioGroup label="Option Type:" value={optionType}>
             <RadioInput
+              checked={optionType === 'finish'}
               label="Finish"
               name="option-type"
               onChange={setValue(setOptionType)}
               value="finish"
             />
             <RadioInput
+              checked={optionType === 'structural'}
               label="Structural"
               name="option-type"
               onChange={setValue(setOptionType)}
@@ -183,7 +189,9 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
               value="bath5"
             />
             <CheckboxInput
+              checked={getIsChecked('kitchen')}
               label="Kitchen"
+              onChange={noop}
               onClick={setCheckboxValues(location, setLocation)}
               value="kitchen"
             />
@@ -254,7 +262,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, url }) => {
               <Button
                 className={styles.buttonSecondary}
                 disabled={buttonIsDisabled}
-                onClick={handleCancel}
+                onClick={showEditView(false)}
                 text="Cancel"
               />
             )}
