@@ -99,6 +99,21 @@ export const flexRow = css`
   width: 100%;
 `;
 
+export const imageUpload = css`
+  ${flexRow}
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+
+  .label {
+    margin-right: 10px;
+  }
+
+  input {
+    margin-top: 20px;
+  }
+`;
+
 export const label = css`
   font-weight: 600;
   margin-bottom: 5px;

@@ -98,6 +98,8 @@ class Tabset extends Component {
       {
         dataItems: [],
         dbError: null,
+        selectedItem: null,
+        selectedItemKey: '',
       },
       async () => {
         try {

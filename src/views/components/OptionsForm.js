@@ -15,6 +15,7 @@ import {
   CheckboxInput,
   DropdownMenu,
   DropdownOption,
+  ImageUpload,
   RadioGroup,
   RadioInput,
   TextArea,
@@ -289,6 +290,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
         </div>
         <div className={formSection}>
+          <ImageUpload id="option-image" onChange={noop} />
+
           <TextArea
             labelText="Extended Description"
             onChange={setValue(setExtendedDescription)}

@@ -6,6 +6,7 @@ export { default as AdminHeader } from './AdminHeader';
 export { default as Button } from './Button';
 export { default as CheckboxGroup } from './CheckboxGroup';
 export { default as DropdownMenu } from './DropdownMenu';
+export { default as ImageUpload } from './ImageUpload';
 export { default as RadioGroup } from './RadioGroup';
 export { default as SignOutButton } from './SignOutButton';
 export { default as TextArea } from './TextArea';
