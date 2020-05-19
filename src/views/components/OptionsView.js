@@ -1,6 +1,7 @@
 import { shape } from 'prop-types';
 import React from 'react';
 
+import { s3bucketUrl } from '../../constants';
 import { optionsViewContainer } from '../../constants/styles/manageOptions';
 import { optionPropType } from '../../constants/propTypeObjects';
 
@@ -67,6 +68,14 @@ const OptionsView = ({ selectedItem }) => {
           <div className="group">
             <div className="title">Extended Description:</div>
             <div className="value">{selectedItem.extendedDescription}</div>
+          </div>
+        )}
+        {selectedItem.imageKey && (
+          <div className="group">
+            <div className="title">Image:</div>
+            <div className="value">
+              <img src={`${s3bucketUrl}/${selectedItem.imageKey}`} alt="Product" />
+            </div>
           </div>
         )}
       </div>

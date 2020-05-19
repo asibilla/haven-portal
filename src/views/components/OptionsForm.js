@@ -8,6 +8,7 @@ import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
+import { deleteImage, uploadImage } from '../../helpers/s3';
 
 import {
   Button,
@@ -15,6 +16,7 @@ import {
   CheckboxInput,
   DropdownMenu,
   DropdownOption,
+  ImageUpload,
   RadioGroup,
   RadioInput,
   TextArea,
@@ -38,10 +40,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [extendedDescription, setExtendedDescription] = useState('');
   const [features, setFeatures] = useState('');
   const [materials, setMaterials] = useState('');
+  const [imageKey, setImageKey] = useState('');
 
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
+  const [imageError, setImageError] = useState(null);
 
   useEffect(() => {
     if (selectedItem) {
@@ -55,6 +59,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
       setExtendedDescription(selectedItem.extendedDescription);
       setFeatures(selectedItem.features.join('\n'));
       setMaterials(selectedItem.materials.join('\n'));
+      setImageKey(selectedItem.imageKey);
     }
   }, [url]);
 
@@ -80,6 +85,31 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
     return productLocation.indexOf(value) > -1;
   };
 
+  const handleImageUpload = async (e) => {
+    if (e.target.files && e.target.files.length) {
+      try {
+        const data = await uploadImage({ authData, file: e.target.files[0] });
+        if (!data.Location) {
+          throw new Error('Could not upload image to s3');
+        }
+        setImageKey(data.Key);
+      } catch (err) {
+        setImageError('Something went wrong: ', err.message);
+      }
+    } else {
+      setImageError('Something went wrong while uploading your image.');
+    }
+  };
+
+  const handleImageDelete = async () => {
+    try {
+      await deleteImage({ authData, key: imageKey });
+      setImageKey('');
+    } catch (err) {
+      setImageError('An error occured while removing image', err.message);
+    }
+  };
+
   const clearState = () => {
     setOptionType('finish');
     setName('');
@@ -91,6 +121,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
     setExtendedDescription('');
     setFeatures('');
     setMaterials('');
+    setImageKey('');
   };
 
   const handleSubmit = async (e) => {
@@ -112,6 +143,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription }),
         new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice) }),
         new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials) }),
+        new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey }),
       ];
 
       const keyItems = {
@@ -133,6 +165,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         extendedDescription,
         features: textAreaToArray(features),
         id,
+        imageKey,
         productLevel,
         productLocation,
         productName,
@@ -289,6 +322,14 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
         </div>
         <div className={formSection}>
+          <ImageUpload
+            id="option-image"
+            error={imageError}
+            image={imageKey}
+            onChange={handleImageUpload}
+            removeImage={handleImageDelete}
+          />
+
           <TextArea
             labelText="Extended Description"
             onChange={setValue(setExtendedDescription)}
