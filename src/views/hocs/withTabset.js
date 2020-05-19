@@ -8,6 +8,7 @@ import { content, tab, tabset } from '../../constants/styles/tabset';
 
 import AppContext from '../../helpers/context';
 import { deleteItem, scanDB } from '../../helpers/db';
+import { deleteImage } from '../../helpers/s3';
 
 import { DropdownMenu, DropdownOption } from '../components';
 
@@ -78,6 +79,7 @@ class Tabset extends Component {
 
       try {
         await deleteItem({ authData, item, tableName });
+        await deleteImage({ authData, key: selectedItem.imageKey });
         this.setState({
           selectedItem: null,
           selectedItemKey: '',

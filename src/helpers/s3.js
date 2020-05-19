@@ -43,3 +43,19 @@ export const uploadImage = async ({ authData, file }) => {
     return Promise.reject(e);
   }
 };
+
+export const deleteImage = async ({ authData, key }) => {
+  try {
+    const s3Service = await getS3Service(authData);
+    return new Promise((resolve, reject) => {
+      s3Service.deleteObject({ Key: key }, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

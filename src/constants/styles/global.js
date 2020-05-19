@@ -128,6 +128,10 @@ export const imageUploadDelete = css`
       max-width: 100%;
     }
   }
+
+  .delete {
+    cursor: pointer;
+  }
 `;
 
 export const inputError = css`

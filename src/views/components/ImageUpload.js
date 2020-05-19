@@ -19,7 +19,7 @@ const ImageUpload = ({ error, id, image, onChange, removeImage }) => {
           role="button"
           tabIndex={0}
         >
-          <FontAwesomeIcon icon={faTimesCircle} size="2x" />
+          <FontAwesomeIcon icon={faTimesCircle} />
         </div>
       </div>
     );

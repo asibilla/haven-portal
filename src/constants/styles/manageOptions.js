@@ -52,5 +52,9 @@ export const optionsViewContainer = css`
       margin: 0;
       padding-left: 0;
     }
+
+    img {
+      max-width: 100%;
+    }
   }
 `;
