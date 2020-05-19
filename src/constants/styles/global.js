@@ -114,6 +114,22 @@ export const imageUpload = css`
   }
 `;
 
+export const imageUploadDelete = css`
+  ${flexRow}
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+
+  .thumbnail {
+    margin-right: 10px;
+    width: 140px;
+
+    img {
+      max-width: 100%;
+    }
+  }
+`;
+
 export const inputError = css`
   ${errorText}
   margin-top: 3px;

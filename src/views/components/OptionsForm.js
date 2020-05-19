@@ -40,12 +40,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [extendedDescription, setExtendedDescription] = useState('');
   const [features, setFeatures] = useState('');
   const [materials, setMaterials] = useState('');
+  const [imageKey, setImageKey] = useState('');
 
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [imageError, setImageError] = useState(null);
-  // const [imageLoading, setImageLoading] = useState(null);
 
   useEffect(() => {
     if (selectedItem) {
@@ -85,13 +85,15 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   };
 
   const handleImageUpload = async (e) => {
-    console.log(e.target.files);
     if (e.target.files && e.target.files.length) {
       try {
         const data = await uploadImage({ authData, file: e.target.files[0] });
         console.log('the data', data);
+        if (!data.Location) {
+          throw new Error('Could not upload image to s3');
+        }
+        setImageKey(data.Key);
       } catch (err) {
-        console.log('the error', err);
         setImageError('Something went wrong: ', err.message);
       }
     } else {
@@ -308,7 +310,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
         </div>
         <div className={formSection}>
-          <ImageUpload id="option-image" error={imageError} onChange={handleImageUpload} />
+          <ImageUpload
+            id="option-image"
+            error={imageError}
+            image={imageKey}
+            onChange={handleImageUpload}
+          />
 
           <TextArea
             labelText="Extended Description"
