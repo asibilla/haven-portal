@@ -20,3 +20,26 @@ export const getS3Service = (authData) => {
     });
   });
 };
+
+export const uploadImage = async ({ authData, file }) => {
+  try {
+    const s3Service = await getS3Service(authData);
+    const upload = s3Service.upload({
+      Key: file.name,
+      Body: file,
+    });
+
+    return new Promise((resolve, reject) => {
+      upload.promise().then(
+        (data) => {
+          resolve(data);
+        },
+        (err) => {
+          reject(err);
+        }
+      );
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};

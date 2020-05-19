@@ -8,6 +8,7 @@ import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
+import { uploadImage } from '../../helpers/s3';
 
 import {
   Button,
@@ -43,6 +44,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
+  const [imageError, setImageError] = useState(null);
+  // const [imageLoading, setImageLoading] = useState(null);
 
   useEffect(() => {
     if (selectedItem) {
@@ -79,6 +82,21 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
 
   const getIsChecked = (value) => {
     return productLocation.indexOf(value) > -1;
+  };
+
+  const handleImageUpload = async (e) => {
+    console.log(e.target.files);
+    if (e.target.files && e.target.files.length) {
+      try {
+        const data = await uploadImage({ authData, file: e.target.files[0] });
+        console.log('the data', data);
+      } catch (err) {
+        console.log('the error', err);
+        setImageError('Something went wrong: ', err.message);
+      }
+    } else {
+      setImageError('Something went wrong while uploading your image.');
+    }
   };
 
   const clearState = () => {
@@ -290,7 +308,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
         </div>
         <div className={formSection}>
-          <ImageUpload id="option-image" onChange={noop} />
+          <ImageUpload id="option-image" error={imageError} onChange={handleImageUpload} />
 
           <TextArea
             labelText="Extended Description"

@@ -114,6 +114,12 @@ export const imageUpload = css`
   }
 `;
 
+export const inputError = css`
+  ${errorText}
+  margin-top: 3px;
+  min-height: 16px;
+`;
+
 export const label = css`
   font-weight: 600;
   margin-bottom: 5px;

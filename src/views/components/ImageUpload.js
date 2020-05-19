@@ -5,18 +5,26 @@ import React from 'react';
 
 import { styles } from '../../constants';
 
-const ImageUpload = ({ id, onChange }) => {
+const ImageUpload = ({ id, onChange, error }) => {
   return (
     <div className={styles.imageUpload}>
       <div className="label" htmlFor={id}>
         <FontAwesomeIcon color={styles.darkGrey} icon={faImage} size="8x" />
       </div>
-      <input id={id} onChange={onChange} type="file" />
+      <div>
+        <input id={id} onChange={onChange} type="file" />
+        <div className={styles.inputError}>{error && `${error}`}</div>
+      </div>
     </div>
   );
 };
 
+ImageUpload.defaultProps = {
+  error: null,
+};
+
 ImageUpload.propTypes = {
+  error: string,
   id: string.isRequired,
   onChange: func.isRequired,
 };
