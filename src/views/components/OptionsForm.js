@@ -6,9 +6,11 @@ import { v4 } from 'uuid';
 import { styles } from '../../constants';
 import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
+
+import { createError } from '../../helpers';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
-import { deleteImage, uploadImage } from '../../helpers/s3';
+import { deleteImage, getImage, uploadImage } from '../../helpers/s3';
 
 import {
   Button,
@@ -86,15 +88,24 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   };
 
   const handleImageUpload = async (e) => {
+    setImageError(null);
+    e.persist();
     if (e.target.files && e.target.files.length) {
       try {
+        const existingImage = await getImage({ authData, key: e.target.files[0].name });
+        if (existingImage) {
+          throw createError(
+            'An image with this filename already exists. Please use a unique filename'
+          );
+        }
+
         const data = await uploadImage({ authData, file: e.target.files[0] });
         if (!data.Location) {
-          throw new Error('Could not upload image to s3');
+          throw createError('Could not upload image to s3');
         }
         setImageKey(data.Key);
       } catch (err) {
-        setImageError('Something went wrong: ', err.message);
+        setImageError(`Something went wrong: ${err.message}`);
       }
     } else {
       setImageError('Something went wrong while uploading your image.');
@@ -102,11 +113,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   };
 
   const handleImageDelete = async () => {
+    setImageError(null);
     try {
       await deleteImage({ authData, key: imageKey });
       setImageKey('');
     } catch (err) {
-      setImageError('An error occured while removing image', err.message);
+      setImageError(`Something went wrong: ${err.message}`);
     }
   };
 
@@ -157,7 +169,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         await refreshData();
         showEditView(false)();
       } catch (err) {
-        setSubmitError(`An error occured: `, err.message);
+        setSubmitError(`An error occured: ${err.message}`);
       }
     } else {
       const item = {
@@ -181,7 +193,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         clearState();
         refreshData();
       } catch (err) {
-        setSubmitError(`An error occured: `, err.message);
+        setSubmitError(`An error occured: ${err.message}`);
       }
       setButtonIsDisabled(false);
     }
