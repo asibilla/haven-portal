@@ -136,6 +136,7 @@ export const imageUploadDelete = css`
 
 export const inputError = css`
   ${errorText}
+  margin-bottom: 15px;
   margin-top: 3px;
   min-height: 16px;
 `;
@@ -235,7 +236,6 @@ export const textAlignLeft = css`
 export const textInput = css`
   border: solid 1px ${darkGrey};
   border-radius: 5px;
-  margin-bottom: 15px;
   padding: 8px 10px;
   width: 100%;
 `;

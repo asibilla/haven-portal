@@ -4,7 +4,16 @@ import { cx } from 'react-emotion';
 
 import { styles } from '../../constants';
 
-const TextInput = ({ className, instructions, labelText, onChange, placeholder, rows, value }) => {
+const TextInput = ({
+  className,
+  error,
+  instructions,
+  labelText,
+  onChange,
+  placeholder,
+  rows,
+  value,
+}) => {
   return (
     <label htmlFor={placeholder}>
       {labelText && <div className={styles.label}>{labelText}</div>}
@@ -17,12 +26,14 @@ const TextInput = ({ className, instructions, labelText, onChange, placeholder, 
         rows={rows}
         value={value}
       />
+      <div className={styles.inputError}>{error && `${error}`}</div>
     </label>
   );
 };
 
 TextInput.defaultProps = {
   className: '',
+  error: '',
   instructions: '',
   labelText: '',
   placeholder: '',
@@ -32,6 +43,7 @@ TextInput.defaultProps = {
 
 TextInput.propTypes = {
   className: string,
+  error: string,
   instructions: string,
   labelText: string,
   onChange: func.isRequired,

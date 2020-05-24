@@ -1,4 +1,4 @@
-import { noop } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 import { func, shape, string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
@@ -10,6 +10,7 @@ import { buttonContainer, formContainer, formSection } from '../../constants/sty
 import { createError } from '../../helpers';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
+import { ValidationItem, validateItems } from '../../helpers/formValidation';
 import { deleteImage, getImage, uploadImage } from '../../helpers/s3';
 
 import {
@@ -48,6 +49,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [imageError, setImageError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     if (selectedItem) {
@@ -139,8 +141,24 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const handleSubmit = async (e) => {
     e.preventDefault();
     setButtonIsDisabled(true);
+    setValidationErrors({});
 
-    // Add validation
+    const validationObj = [
+      new ValidationItem({
+        displayName: 'Name',
+        fieldName: 'productName',
+        isRequiredString: true,
+        value: productName,
+      }),
+    ];
+
+    const errors = validateItems({ items: validationObj });
+
+    if (!isEmpty(errors)) {
+      setValidationErrors(errors);
+      setButtonIsDisabled(false);
+      return;
+    }
 
     const id = selectedItem ? selectedItem.id : v4();
 
@@ -221,7 +239,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             />
           </RadioGroup>
 
-          <TextInput labelText="Name:" onChange={setValue(setName)} value={productName} />
+          <TextInput
+            error={validationErrors.productName}
+            labelText="Name:"
+            onChange={setValue(setName)}
+            value={productName}
+          />
 
           <DropdownMenu
             id="productLevel"

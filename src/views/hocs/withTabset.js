@@ -79,7 +79,9 @@ class Tabset extends Component {
 
       try {
         await deleteItem({ authData, item, tableName });
-        await deleteImage({ authData, key: selectedItem.imageKey });
+        if (selectedItem.imageKey) {
+          await deleteImage({ authData, key: selectedItem.imageKey });
+        }
         this.setState({
           selectedItem: null,
           selectedItemKey: '',
