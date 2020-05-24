@@ -1,5 +1,9 @@
 import { css } from 'react-emotion';
 
+export const inputMargin = css`
+  margin-bottom: -15px;
+`;
+
 export const listStyle = css`
   text-align: left;
   margin-bottom: 30px;
@@ -8,10 +12,6 @@ export const listStyle = css`
 
 export const logoWrapper = css`
   margin-bottom: 60px;
-`;
-
-export const passwordMargin = css`
-  margin-bottom: 40px;
 `;
 
 export const wrapper = css`

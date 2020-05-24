@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { routes, styles } from '../../constants';
-import { listStyle, logoWrapper, passwordMargin, wrapper } from '../../constants/styles/signin';
+import { inputMargin, listStyle, logoWrapper, wrapper } from '../../constants/styles/signin';
 import { completePasswordChallenge, getJwt, isAdmin, signIn } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
 import { Button, TextInput } from '../components';
@@ -75,12 +75,12 @@ const UserSignin = () => {
           <form onSubmit={handleSubmit}>
             {formError && <p className={styles.errorText}>{formError}</p>}
             <TextInput
+              className={inputMargin}
               onChange={createUpdateFormValueFn(setUserName)}
               placeholder="Username"
               value={userName}
             />
             <TextInput
-              className={passwordMargin}
               onChange={createUpdateFormValueFn(setPassword)}
               placeholder="Password"
               type="password"
@@ -103,13 +103,13 @@ const UserSignin = () => {
           <form onSubmit={handlePasswordChallengeSubmit}>
             {formError && <p className={styles.errorText}>{formError}</p>}
             <TextInput
+              className={inputMargin}
               onChange={createUpdateFormValueFn(setNewPassword)}
               placeholder="Password"
               type="password"
               value={newPassword}
             />
             <TextInput
-              className={passwordMargin}
               onChange={createUpdateFormValueFn(setConfirmPassword)}
               placeholder="Confirm Password"
               type="password"

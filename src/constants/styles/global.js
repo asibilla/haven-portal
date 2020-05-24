@@ -136,6 +136,7 @@ export const imageUploadDelete = css`
 
 export const inputError = css`
   ${errorText}
+  margin-bottom: 15px;
   margin-top: 3px;
   min-height: 16px;
 `;
@@ -158,7 +159,7 @@ export const radioContainer = css`
 `;
 
 export const radioGroup = css`
-  margin-bottom: 15px;
+  margin-bottom: 3px;
 `;
 
 export const radioLabel = css`
@@ -178,7 +179,7 @@ export const selectInput = css`
   border: 1px solid ${darkGrey};
   border-radius: 5px;
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 3px;
   max-width: 400px;
   min-width: 180px;
   position: relative;
@@ -235,7 +236,6 @@ export const textAlignLeft = css`
 export const textInput = css`
   border: solid 1px ${darkGrey};
   border-radius: 5px;
-  margin-bottom: 15px;
   padding: 8px 10px;
   width: 100%;
 `;

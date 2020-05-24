@@ -1,4 +1,4 @@
-import { noop } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 import { func, shape, string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
@@ -6,9 +6,12 @@ import { v4 } from 'uuid';
 import { styles } from '../../constants';
 import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
+
+import { createError } from '../../helpers';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
-import { deleteImage, uploadImage } from '../../helpers/s3';
+import { ValidationItem, validateItems } from '../../helpers/formValidation';
+import { deleteImage, getImage, uploadImage } from '../../helpers/s3';
 
 import {
   Button,
@@ -46,6 +49,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [imageError, setImageError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     if (selectedItem) {
@@ -86,15 +90,24 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   };
 
   const handleImageUpload = async (e) => {
+    setImageError(null);
+    e.persist();
     if (e.target.files && e.target.files.length) {
       try {
+        const existingImage = await getImage({ authData, key: e.target.files[0].name });
+        if (existingImage) {
+          throw createError(
+            'An image with this filename already exists. Please use a unique filename'
+          );
+        }
+
         const data = await uploadImage({ authData, file: e.target.files[0] });
         if (!data.Location) {
-          throw new Error('Could not upload image to s3');
+          throw createError('Could not upload image to s3');
         }
         setImageKey(data.Key);
       } catch (err) {
-        setImageError('Something went wrong: ', err.message);
+        setImageError(`Something went wrong: ${err.message}`);
       }
     } else {
       setImageError('Something went wrong while uploading your image.');
@@ -102,11 +115,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   };
 
   const handleImageDelete = async () => {
+    setImageError(null);
     try {
       await deleteImage({ authData, key: imageKey });
       setImageKey('');
     } catch (err) {
-      setImageError('An error occured while removing image', err.message);
+      setImageError(`Something went wrong: ${err.message}`);
     }
   };
 
@@ -127,8 +141,48 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const handleSubmit = async (e) => {
     e.preventDefault();
     setButtonIsDisabled(true);
+    setValidationErrors({});
 
-    // Add validation
+    const validationObj = [
+      new ValidationItem({
+        displayName: 'Name',
+        fieldName: 'productName',
+        isRequiredString: true,
+        value: productName,
+      }),
+      new ValidationItem({
+        displayName: 'Contractor Price',
+        fieldName: 'contractorPrice',
+        isNumber: true,
+        value: contractorPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Sell Price',
+        fieldName: 'sellPrice',
+        isNumber: true,
+        value: sellPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Sell Price',
+        fieldName: 'sellPrice',
+        isNumber: true,
+        value: sellPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Location',
+        fieldName: 'productLocation',
+        isRequiredSelect: true,
+        value: productLocation,
+      }),
+    ];
+
+    const errors = validateItems({ items: validationObj });
+
+    if (!isEmpty(errors)) {
+      setValidationErrors(errors);
+      setButtonIsDisabled(false);
+      return;
+    }
 
     const id = selectedItem ? selectedItem.id : v4();
 
@@ -157,7 +211,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         await refreshData();
         showEditView(false)();
       } catch (err) {
-        setSubmitError(`An error occured: `, err.message);
+        setSubmitError(`An error occured: ${err.message}`);
       }
     } else {
       const item = {
@@ -181,7 +235,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         clearState();
         refreshData();
       } catch (err) {
-        setSubmitError(`An error occured: `, err.message);
+        setSubmitError(`An error occured: ${err.message}`);
       }
       setButtonIsDisabled(false);
     }
@@ -209,7 +263,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             />
           </RadioGroup>
 
-          <TextInput labelText="Name:" onChange={setValue(setName)} value={productName} />
+          <TextInput
+            error={validationErrors.productName}
+            labelText="Name:"
+            onChange={setValue(setName)}
+            value={productName}
+          />
 
           <DropdownMenu
             id="productLevel"
@@ -225,7 +284,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             <DropdownOption text="Level 5" value="level5" />
           </DropdownMenu>
 
-          <CheckboxGroup label="Location:">
+          <CheckboxGroup error={validationErrors.productLocation} label="Location:">
             <CheckboxInput
               checked={getIsChecked('bar')}
               label="Bar"
@@ -299,6 +358,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           </CheckboxGroup>
 
           <TextInput
+            error={validationErrors.sellPrice}
             instructions="Numbers and decimals only."
             labelText="Sell Price:"
             onChange={setValue(setSellPrice)}
@@ -307,6 +367,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
 
           <TextInput
+            error={validationErrors.contractorPrice}
             instructions="Numbers and decimals only."
             labelText="Contractor Price:"
             onChange={setValue(setContractorPrice)}

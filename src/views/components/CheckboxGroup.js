@@ -39,23 +39,26 @@ CheckboxInput.propTypes = {
   value: string.isRequired,
 };
 
-const CheckboxGroup = ({ children, className, label }) => {
+const CheckboxGroup = ({ children, className, error, label }) => {
   return (
     <div className={cx(styles.radioGroup, className)}>
       <div className={styles.label}>{label}</div>
       <div>{children}</div>
+      <div className={styles.inputError}>{error && `${error}`}</div>
     </div>
   );
 };
 
 CheckboxGroup.defaultProps = {
   className: '',
+  error: '',
   label: '',
 };
 
 CheckboxGroup.propTypes = {
   className: string,
   children: arrayOf(node).isRequired,
+  error: string,
   label: string,
 };
 
