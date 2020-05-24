@@ -38,7 +38,11 @@ const AdminHeader = () => {
                 </NavLink>
               </li>
               <li>
-                <NavLink activeClassName="active" className={navLink} to="/manage-users">
+                <NavLink
+                  activeClassName="active"
+                  className={navLink}
+                  to={`${match.url}/manage-users`}
+                >
                   Manage Users
                 </NavLink>
               </li>
