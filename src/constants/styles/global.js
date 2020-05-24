@@ -159,7 +159,7 @@ export const radioContainer = css`
 `;
 
 export const radioGroup = css`
-  margin-bottom: 15px;
+  margin-bottom: 3px;
 `;
 
 export const radioLabel = css`
@@ -179,7 +179,7 @@ export const selectInput = css`
   border: 1px solid ${darkGrey};
   border-radius: 5px;
   display: block;
-  margin-bottom: 15px;
+  margin-bottom: 3px;
   max-width: 400px;
   min-width: 180px;
   position: relative;

@@ -13,7 +13,16 @@ DropdownOption.propTypes = {
   value: string.isRequired,
 };
 
-const DropdownMenu = ({ id, children, className, label, labelClassName, onChange, value }) => {
+const DropdownMenu = ({
+  id,
+  children,
+  className,
+  error,
+  label,
+  labelClassName,
+  onChange,
+  value,
+}) => {
   return (
     <div>
       {label && (
@@ -26,12 +35,14 @@ const DropdownMenu = ({ id, children, className, label, labelClassName, onChange
           {children}
         </select>
       </div>
+      <div className={styles.inputError}>{error && `${error}`}</div>
     </div>
   );
 };
 
 DropdownMenu.defaultProps = {
   className: '',
+  error: '',
   label: '',
   labelClassName: '',
   value: '',
@@ -41,6 +52,7 @@ DropdownMenu.propTypes = {
   id: string.isRequired,
   className: string,
   children: oneOfType([node, arrayOf(node)]).isRequired,
+  error: string,
   label: string,
   labelClassName: string,
   onChange: func.isRequired,

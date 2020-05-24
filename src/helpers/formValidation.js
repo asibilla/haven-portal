@@ -29,6 +29,7 @@ export class ValidationItem {
     }
     if (this.isNumber && !/^[0-9]+(\.[0-9]+)?$/.test(this.value)) {
       this.errorMessage = `Please enter a valid number. (Numbers and decimals only).`;
+      return false;
     }
     return true;
   }

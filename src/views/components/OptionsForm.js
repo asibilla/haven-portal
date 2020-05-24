@@ -150,6 +150,30 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         isRequiredString: true,
         value: productName,
       }),
+      new ValidationItem({
+        displayName: 'Contractor Price',
+        fieldName: 'contractorPrice',
+        isNumber: true,
+        value: contractorPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Sell Price',
+        fieldName: 'sellPrice',
+        isNumber: true,
+        value: sellPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Sell Price',
+        fieldName: 'sellPrice',
+        isNumber: true,
+        value: sellPrice,
+      }),
+      new ValidationItem({
+        displayName: 'Location',
+        fieldName: 'productLocation',
+        isRequiredSelect: true,
+        value: productLocation,
+      }),
     ];
 
     const errors = validateItems({ items: validationObj });
@@ -260,7 +284,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             <DropdownOption text="Level 5" value="level5" />
           </DropdownMenu>
 
-          <CheckboxGroup label="Location:">
+          <CheckboxGroup error={validationErrors.productLocation} label="Location:">
             <CheckboxInput
               checked={getIsChecked('bar')}
               label="Bar"
@@ -334,6 +358,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           </CheckboxGroup>
 
           <TextInput
+            error={validationErrors.sellPrice}
             instructions="Numbers and decimals only."
             labelText="Sell Price:"
             onChange={setValue(setSellPrice)}
@@ -342,6 +367,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
           />
 
           <TextInput
+            error={validationErrors.contractorPrice}
             instructions="Numbers and decimals only."
             labelText="Contractor Price:"
             onChange={setValue(setContractorPrice)}

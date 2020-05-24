@@ -37,23 +37,26 @@ RadioInput.propTypes = {
   value: string.isRequired,
 };
 
-const RadioGroup = ({ children, className, label }) => {
+const RadioGroup = ({ children, className, error, label }) => {
   return (
     <div className={cx(styles.radioGroup, className)}>
       <div className={styles.label}>{label}</div>
       <div>{children}</div>
+      <div className={styles.inputError}>{error && `${error}`}</div>
     </div>
   );
 };
 
 RadioGroup.defaultProps = {
   className: '',
+  error: '',
   label: '',
 };
 
 RadioGroup.propTypes = {
   className: string,
   children: arrayOf(node).isRequired,
+  error: string,
   label: string,
 };
 

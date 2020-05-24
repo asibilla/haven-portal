@@ -124,7 +124,7 @@ class Tabset extends Component {
     return () => {
       if ((tabName === ADD_NEW && !addNewIsActive) || (tabName === MANAGE && addNewIsActive)) {
         const newState = !addNewIsActive;
-        this.setState({ addNewIsActive: newState });
+        this.setState({ addNewIsActive: newState, dbError: null, successMessage: '' });
       }
     };
   }
