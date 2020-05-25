@@ -46,3 +46,9 @@ export const usersHeaderRow = cx(
     }
   `
 );
+
+export const addNewWrapper = css`
+  max-width: 375px;
+  padding: 30px;
+  width: 100%;
+`;

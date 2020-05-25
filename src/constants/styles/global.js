@@ -145,6 +145,7 @@ export const inputError = css`
 export const label = css`
   font-weight: 600;
   margin-bottom: 5px;
+  text-align: left;
 `;
 
 export const messageContainer = css`
@@ -161,6 +162,7 @@ export const radioContainer = css`
 
 export const radioGroup = css`
   margin-bottom: 3px;
+  text-align: left;
 `;
 
 export const radioLabel = css`
