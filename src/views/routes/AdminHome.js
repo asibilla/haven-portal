@@ -8,6 +8,7 @@ import AppContext from '../../helpers/context';
 import { AdminHeader } from '../components';
 import AdminOverview from './AdminOverview';
 import ManageOptions from './ManageOptions';
+import ManageUsers from './ManageUsers';
 
 const AdminHome = ({ url }) => {
   const { authData } = useContext(AppContext);
@@ -32,6 +33,7 @@ const AdminHome = ({ url }) => {
         <Switch>
           <Route exact path={match.path} component={AdminOverview} />
           <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
+          <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
         </Switch>
       </div>
     </div>

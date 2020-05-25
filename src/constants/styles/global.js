@@ -33,6 +33,7 @@ export const black = '#000';
 export const darkGrey = '#5B5C5E';
 export const lightGrey = '#a3a3a3';
 export const redError = '#b22222';
+export const greyBackground = '#ddd';
 export const greenSuccess = '#008000';
 export const white = '#fff';
 
