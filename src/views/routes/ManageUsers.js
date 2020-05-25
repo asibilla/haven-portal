@@ -6,10 +6,13 @@ import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUs
 import { getGroupsForUsers, getUsers } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 
+import AddUserForm from '../components/AddUserForm';
+
 const ManageUsers = ({ url }) => {
   const { authData } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isNewUserView, setIsNewUserView] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -23,12 +26,27 @@ const ManageUsers = ({ url }) => {
     })();
   }, [url]);
 
+  const toggleNewUserView = (show = true) => {
+    return (e) => {
+      e.preventDefault();
+      setIsNewUserView(show);
+    };
+  };
+
+  if (isNewUserView) {
+    return <AddUserForm onCancel={toggleNewUserView(false)} />;
+  }
+
   return (
     <div>
       <h3>Manage Users</h3>
       <div className={styles.inputError}>{errorMsg && `${errorMsg}`}</div>
       <div>
-        <div className={addNew}>+ Add New User</div>
+        <div className={addNew}>
+          <a href="#add-new-user" onClick={toggleNewUserView()}>
+            + Add New User
+          </a>
+        </div>
         <div className={usersHeaderRow}>
           <div className="username">Username</div>
           <div className="email">Email Address</div>

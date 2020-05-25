@@ -74,6 +74,27 @@ export const getUsers = async ({ authData }) => {
   }
 };
 
+export const getGroups = async ({ authData }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.listGroups(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data.Groups.map((group) => group.GroupName));
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getGroupsForUsers = async ({ authData, users }) => {
   try {
     const serviceProvider = await getServiceProvider(authData);
