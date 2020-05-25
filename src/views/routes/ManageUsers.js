@@ -2,6 +2,7 @@ import { string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { styles } from '../../constants';
+import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
 import { getGroupsForUsers, getUsers } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 
@@ -27,9 +28,21 @@ const ManageUsers = ({ url }) => {
       <h3>Manage Users</h3>
       <div className={styles.inputError}>{errorMsg && `${errorMsg}`}</div>
       <div>
+        <div className={addNew}>+ Add New User</div>
+        <div className={usersHeaderRow}>
+          <div className="username">Username</div>
+          <div className="email">Email Address</div>
+          <div>Created</div>
+          <div>User Group</div>
+        </div>
+
         {users.map((user) => (
-          <div key={user.username}>
-            <div>{user.username}</div>
+          <div className={userRow} key={user.username}>
+            <div className="username">{user.username}</div>
+            <div className="email">{user.email}</div>
+            <div>{user.created}</div>
+            <div>{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
+            <div className="manage">Manage | Delete</div>
           </div>
         ))}
       </div>

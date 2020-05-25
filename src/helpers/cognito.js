@@ -1,4 +1,5 @@
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import moment from 'moment';
 
 import { cognitoPool } from '../constants';
 
@@ -30,7 +31,7 @@ class CognitoUser {
   }
 
   get created() {
-    return this.user.UserCreateDate.toString();
+    return moment(this.user.UserCreateDate).format('MM-DD-YYYY');
   }
 
   get modified() {
