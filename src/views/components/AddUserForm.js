@@ -9,7 +9,7 @@ import { getGroups } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import { Button, RadioGroup, RadioInput, TextInput } from '.';
+import { Button, RadioGroup, RadioInput, Spinner, TextInput } from '.';
 
 const AddUserForm = ({ onCancel, url }) => {
   const { authData } = useContext(AppContext);
@@ -22,11 +22,18 @@ const AddUserForm = ({ onCancel, url }) => {
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [formError, setFormError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const userGroups = await getGroups({ authData });
-      setGroups(userGroups);
+      try {
+        const userGroups = await getGroups({ authData });
+        setGroups(userGroups);
+        setLoading(false);
+      } catch (err) {
+        setFormError(`Something went wrong: ${err.message}`);
+        setLoading(false);
+      }
     })();
   }, [url]);
 
@@ -74,40 +81,44 @@ const AddUserForm = ({ onCancel, url }) => {
       <div className={styles.messageContainer}>
         {formError && <p className={styles.errorText}>{formError}</p>}
       </div>
-      <div className={addNewWrapper}>
-        <form onSubmit={handleSubmit}>
-          <TextInput
-            error={validationErrors.username}
-            labelText="Username"
-            onChange={setValue(setUsername)}
-            value={username}
-          />
-          <TextInput
-            error={validationErrors.tempPassword}
-            labelText="Temporary Password"
-            onChange={setValue(setTempPassword)}
-            value={tempPassword}
-          />
-          <TextInput
-            error={validationErrors.email}
-            labelText="Email"
-            onChange={setValue(setEmail)}
-            value={email}
-          />
-          {groups.length && (
-            <RadioGroup label="User Group">
-              {groups.map((group) => (
-                <Fragment key={group}>
-                  <RadioInput label={group} name="user-group" onChange={() => {}} value={group} />
-                </Fragment>
-              ))}
-            </RadioGroup>
-          )}
+      {loading ? (
+        <Spinner />
+      ) : (
+        <div className={addNewWrapper}>
+          <form onSubmit={handleSubmit}>
+            <TextInput
+              error={validationErrors.username}
+              labelText="Username"
+              onChange={setValue(setUsername)}
+              value={username}
+            />
+            <TextInput
+              error={validationErrors.tempPassword}
+              labelText="Temporary Password"
+              onChange={setValue(setTempPassword)}
+              value={tempPassword}
+            />
+            <TextInput
+              error={validationErrors.email}
+              labelText="Email"
+              onChange={setValue(setEmail)}
+              value={email}
+            />
+            {groups.length && (
+              <RadioGroup label="User Group">
+                {groups.map((group) => (
+                  <Fragment key={group}>
+                    <RadioInput label={group} name="user-group" onChange={() => {}} value={group} />
+                  </Fragment>
+                ))}
+              </RadioGroup>
+            )}
 
-          <Button className={styles.buttonSecondary} onClick={onCancel} text="Cancel" />
-          <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
-        </form>
-      </div>
+            <Button className={styles.buttonSecondary} onClick={onCancel} text="Cancel" />
+            <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
+          </form>
+        </div>
+      )}
     </div>
   );
 };

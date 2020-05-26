@@ -10,7 +10,7 @@ import AppContext from '../../helpers/context';
 import { deleteItem, scanDB } from '../../helpers/db';
 import { deleteImage } from '../../helpers/s3';
 
-import { DropdownMenu, DropdownOption } from '../components';
+import { DropdownMenu, DropdownOption, Spinner } from '../components';
 
 const ADD_NEW = 'add-new';
 const MANAGE = 'manage';
@@ -23,6 +23,7 @@ class Tabset extends Component {
     dataItems: [],
     dbError: null,
     editIsActive: false,
+    loading: true,
     selectedItem: null,
     selectedItemKey: '',
     successMessage: '',
@@ -102,6 +103,7 @@ class Tabset extends Component {
       {
         dataItems: [],
         dbError: null,
+        loading: true,
         selectedItem: null,
         selectedItemKey: '',
       },
@@ -111,9 +113,9 @@ class Tabset extends Component {
             authData,
             tableName,
           });
-          this.setState({ dataItems: data.Items });
+          this.setState({ dataItems: data.Items, loading: false });
         } catch (e) {
-          this.setState({ dbError: `An error occured: ${e.message}` });
+          this.setState({ dbError: `An error occured: ${e.message}`, loading: false });
         }
       }
     );
@@ -159,6 +161,7 @@ class Tabset extends Component {
       dataItems,
       dbError,
       editIsActive,
+      loading,
       selectedItem,
       selectedItemKey,
       successMessage,
@@ -186,40 +189,44 @@ class Tabset extends Component {
             Add New
           </div>
         </div>
-        <div className={content}>
-          <div className={styles.messageContainer}>
-            {dbError && <p className={styles.errorText}>{dbError}</p>}
+        {loading ? (
+          <Spinner />
+        ) : (
+          <div className={content}>
+            <div className={styles.messageContainer}>
+              {dbError && <p className={styles.errorText}>{dbError}</p>}
+            </div>
+            {!addNewIsActive && !editIsActive && (
+              <DropdownMenu
+                id="item-select"
+                onChange={this.updateSelectedItemKey}
+                value={selectedItemKey}
+              >
+                <DropdownOption text="-- Select an Item to Manage --" value="" disabled />
+                {dataItems.map((item) => {
+                  const val = get(item, displayKey);
+                  return (
+                    <Fragment key={val}>
+                      <DropdownOption text={val} value={val} />
+                    </Fragment>
+                  );
+                })}
+              </DropdownMenu>
+            )}
+            <div className={styles.messageContainer}>
+              {successMessage && <p className={styles.successText}>{successMessage}</p>}
+            </div>
+            {selectedItem && !editIsActive && !addNewIsActive && this.editDeleteBlock}
+            <WrappedComponent
+              addNewIsActive={addNewIsActive}
+              editIsActive={editIsActive}
+              refreshData={this.refreshData}
+              selectedItem={selectedItem}
+              showEditView={this.showEditView}
+              updateSuccessMessage={this.updateSuccessMessage}
+            />
           </div>
-          {!addNewIsActive && !editIsActive && (
-            <DropdownMenu
-              id="item-select"
-              onChange={this.updateSelectedItemKey}
-              value={selectedItemKey}
-            >
-              <DropdownOption text="-- Select an Item to Manage --" value="" disabled />
-              {dataItems.map((item) => {
-                const val = get(item, displayKey);
-                return (
-                  <Fragment key={val}>
-                    <DropdownOption text={val} value={val} />
-                  </Fragment>
-                );
-              })}
-            </DropdownMenu>
-          )}
-          <div className={styles.messageContainer}>
-            {successMessage && <p className={styles.successText}>{successMessage}</p>}
-          </div>
-          {selectedItem && !editIsActive && !addNewIsActive && this.editDeleteBlock}
-          <WrappedComponent
-            addNewIsActive={addNewIsActive}
-            editIsActive={editIsActive}
-            refreshData={this.refreshData}
-            selectedItem={selectedItem}
-            showEditView={this.showEditView}
-            updateSuccessMessage={this.updateSuccessMessage}
-          />
-        </div>
+        )}
       </>
     );
   }

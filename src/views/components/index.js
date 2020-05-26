@@ -9,6 +9,7 @@ export { default as DropdownMenu } from './DropdownMenu';
 export { default as ImageUpload } from './ImageUpload';
 export { default as RadioGroup } from './RadioGroup';
 export { default as SignOutButton } from './SignOutButton';
+export { default as Spinner } from './Spinner';
 export { default as TextArea } from './TextArea';
 export { default as TextInput } from './TextInput';
 export { default as ViewWrapper } from './ViewWrapper';
