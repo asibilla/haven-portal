@@ -16,12 +16,20 @@ const ManageUsers = ({ url }) => {
   const [isNewUserView, setIsNewUserView] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const refreshUsers = async () => {
+    try {
+      const cognitoUsers = await getUsers({ authData });
+      const usersWithGroups = await getGroupsForUsers({ authData, users: cognitoUsers });
+      setUsers(usersWithGroups);
+    } catch (e) {
+      setErrorMsg(`Something went wrong: ${e.message}`);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const cognitoUsers = await getUsers({ authData });
-        const usersWithGroups = await getGroupsForUsers({ authData, users: cognitoUsers });
-        setUsers(usersWithGroups);
+        await refreshUsers();
         setLoading(false);
       } catch (e) {
         setErrorMsg(`Something went wrong: ${e.message}`);
@@ -38,7 +46,7 @@ const ManageUsers = ({ url }) => {
   };
 
   if (isNewUserView) {
-    return <AddUserForm onCancel={toggleNewUserView(false)} />;
+    return <AddUserForm onCancel={toggleNewUserView(false)} refresh={refreshUsers} />;
   }
 
   return (

@@ -139,7 +139,7 @@ export const addUserToGroup = async ({ authData, data }) => {
     };
 
     return new Promise((resolve, reject) => {
-      serviceProvider.adminCreateUser(params, (err, response) => {
+      serviceProvider.adminAddUserToGroup(params, (err, response) => {
         if (err) {
           reject(err);
         } else {
@@ -148,7 +148,6 @@ export const addUserToGroup = async ({ authData, data }) => {
       });
     });
   } catch (e) {
-    data.Groups.map((group) => group.GroupName);
     return Promise.reject(e);
   }
 };
@@ -191,7 +190,7 @@ export const createUser = async ({ authData, data }) => {
             });
           } catch (addToGroupErr) {
             reject(
-              createError(`User was created but could not be added to group: ${addToGroupErr}`)
+              createError(`User was created but could not be added to group -- ${addToGroupErr}`)
             );
           }
         }

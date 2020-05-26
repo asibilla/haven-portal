@@ -3,15 +3,15 @@ import { func, string } from 'prop-types';
 import React, { Fragment, useContext, useState, useEffect } from 'react';
 
 import { styles } from '../../constants';
-import { addNewWrapper } from '../../constants/styles/manageUsers';
+import { addNew, addNewWrapper } from '../../constants/styles/manageUsers';
 
-import { getGroups } from '../../helpers/cognito';
+import { createUser, getGroups } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
 import { Button, RadioGroup, RadioInput, Spinner, TextInput } from '.';
 
-const AddUserForm = ({ onCancel, url }) => {
+const AddUserForm = ({ onCancel, refresh, url }) => {
   const { authData } = useContext(AppContext);
 
   const [username, setUsername] = useState('');
@@ -24,6 +24,7 @@ const AddUserForm = ({ onCancel, url }) => {
   const [validationErrors, setValidationErrors] = useState({});
   const [formError, setFormError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -47,7 +48,16 @@ const AddUserForm = ({ onCancel, url }) => {
     };
   };
 
-  const handleSubmit = (e) => {
+  const clearState = () => {
+    setUsername('');
+    setTempPassword('');
+    setEmail('');
+    if (groups.length) {
+      setGroupName(groups[0]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     setButtonIsDisabled(true);
     setValidationErrors({});
     e.preventDefault();
@@ -58,6 +68,18 @@ const AddUserForm = ({ onCancel, url }) => {
         fieldName: 'username',
         isRequiredString: true,
         value: username,
+      }),
+      new ValidationItem({
+        displayName: 'Temporary Password',
+        fieldName: 'tempPassword',
+        isRequiredString: true,
+        value: tempPassword,
+      }),
+      new ValidationItem({
+        displayName: 'Email',
+        fieldName: 'email',
+        isRequiredString: true,
+        value: email,
       }),
     ];
 
@@ -70,13 +92,16 @@ const AddUserForm = ({ onCancel, url }) => {
     }
 
     try {
-      // Get rid of below
-      setUsername('');
+      const data = { email, groupName, tempPassword, username };
+      await createUser({ authData, data });
+      refresh();
+      setButtonIsDisabled(false);
+      setSuccessMsg('User successfully created!');
+      clearState();
     } catch (err) {
       setFormError(`Something went wrong: ${err}`);
+      setButtonIsDisabled(false);
     }
-
-    setButtonIsDisabled(false);
   };
 
   return (
@@ -84,6 +109,12 @@ const AddUserForm = ({ onCancel, url }) => {
       <h3>Add New User</h3>
       <div className={styles.messageContainer}>
         {formError && <p className={styles.errorText}>{formError}</p>}
+        {successMsg && <p className={styles.successText}>{successMsg}</p>}
+      </div>
+      <div className={addNew}>
+        <a href="#add-new-user" onClick={onCancel}>
+          {'<< Back'}
+        </a>
       </div>
       {loading ? (
         <Spinner />
@@ -139,6 +170,7 @@ AddUserForm.defaultProps = {
 
 AddUserForm.propTypes = {
   onCancel: func.isRequired,
+  refresh: func.isRequired,
   url: string,
 };
 
