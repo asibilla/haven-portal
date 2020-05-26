@@ -2,6 +2,7 @@ import { CognitoIdentityServiceProvider } from 'aws-sdk';
 import moment from 'moment';
 
 import { cognitoPool } from '../constants';
+import { createError } from '.';
 
 const getServiceProvider = (authData) => {
   const { awsConfig } = authData;
@@ -122,6 +123,78 @@ export const getGroupsForUsers = async ({ authData, users }) => {
 
     return Promise.all(promises).then((responses) => {
       return responses.map((response) => new CognitoUser(response));
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const addUserToGroup = async ({ authData, data }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: data.username,
+      GroupName: data.groupName,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminAddUserToGroup(params, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const createUser = async ({ authData, data }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: data.username,
+      TemporaryPassword: data.tempPassword,
+      UserAttributes: [
+        {
+          Name: 'email',
+          Value: data.email,
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true',
+        },
+      ],
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminCreateUser(params, async (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          try {
+            const addToGroupResponse = await addUserToGroup({
+              authData,
+              data: {
+                username: data.username,
+                groupName: data.groupName,
+              },
+            });
+            resolve({
+              ...response,
+              ...addToGroupResponse,
+            });
+          } catch (addToGroupErr) {
+            reject(
+              createError(`User was created but could not be added to group -- ${addToGroupErr}`)
+            );
+          }
+        }
+      });
     });
   } catch (e) {
     return Promise.reject(e);
