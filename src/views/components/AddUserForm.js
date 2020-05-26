@@ -17,6 +17,7 @@ const AddUserForm = ({ onCancel, url }) => {
   const [username, setUsername] = useState('');
   const [tempPassword, setTempPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [groupName, setGroupName] = useState('');
   const [groups, setGroups] = useState([]);
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
@@ -29,6 +30,9 @@ const AddUserForm = ({ onCancel, url }) => {
       try {
         const userGroups = await getGroups({ authData });
         setGroups(userGroups);
+        if (userGroups.length) {
+          setGroupName(userGroups[0]);
+        }
         setLoading(false);
       } catch (err) {
         setFormError(`Something went wrong: ${err.message}`);
@@ -105,10 +109,16 @@ const AddUserForm = ({ onCancel, url }) => {
               value={email}
             />
             {groups.length && (
-              <RadioGroup label="User Group">
+              <RadioGroup label="User Group" value={groupName}>
                 {groups.map((group) => (
                   <Fragment key={group}>
-                    <RadioInput label={group} name="user-group" onChange={() => {}} value={group} />
+                    <RadioInput
+                      checked={groupName === group}
+                      label={group}
+                      name="user-group"
+                      onChange={setValue(setGroupName)}
+                      value={group}
+                    />
                   </Fragment>
                 ))}
               </RadioGroup>
