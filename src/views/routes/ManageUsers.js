@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
-import { getGroupsForUsers, getUsers } from '../../helpers/cognito';
+import { deleteUser, getGroupsForUsers, getUsers } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 
 import AddUserForm from '../components/AddUserForm';
@@ -13,10 +13,12 @@ const ManageUsers = ({ url }) => {
   const { authData } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [successMsg, setSuccessMsg] = useState('');
   const [isNewUserView, setIsNewUserView] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const refreshUsers = async () => {
+    setUsers([]);
     try {
       const cognitoUsers = await getUsers({ authData });
       const usersWithGroups = await getGroupsForUsers({ authData, users: cognitoUsers });
@@ -45,6 +47,27 @@ const ManageUsers = ({ url }) => {
     };
   };
 
+  const createDeleteUserFn = (username) => {
+    return async (e) => {
+      e.preventDefault();
+      if (
+        window.confirm(
+          'Are you sure you want to delete this user? This operation cannot be undone.'
+        )
+      ) {
+        try {
+          setLoading(true);
+          await deleteUser({ authData, username });
+          await refreshUsers();
+          setSuccessMsg('User successfully deleted!');
+          setLoading(false);
+        } catch (err) {
+          setErrorMsg(`User could not be deleted: ${err.message}`);
+        }
+      }
+    };
+  };
+
   if (isNewUserView) {
     return <AddUserForm onCancel={toggleNewUserView(false)} refresh={refreshUsers} />;
   }
@@ -52,7 +75,10 @@ const ManageUsers = ({ url }) => {
   return (
     <div>
       <h3>Manage Users</h3>
-      <div className={styles.inputError}>{errorMsg && `${errorMsg}`}</div>
+      <div className={styles.messageContainer}>
+        {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
+        {successMsg && <p className={styles.successText}>{successMsg}</p>}
+      </div>
       {loading ? (
         <Spinner />
       ) : (
@@ -75,7 +101,12 @@ const ManageUsers = ({ url }) => {
               <div className="email">{user.email}</div>
               <div>{user.created}</div>
               <div>{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
-              <div className="manage">Manage | Delete</div>
+              <div className="manage">
+                {`Manage${' | '}`}
+                <a href="#delete" onClick={createDeleteUserFn(user.username)}>
+                  Delete
+                </a>
+              </div>
             </div>
           ))}
         </div>
