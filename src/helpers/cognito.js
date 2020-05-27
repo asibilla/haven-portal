@@ -200,3 +200,25 @@ export const createUser = async ({ authData, data }) => {
     return Promise.reject(e);
   }
 };
+
+export const deleteUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminDeleteUser(params, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
