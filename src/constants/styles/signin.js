@@ -1,5 +1,17 @@
 import { css } from 'react-emotion';
 
+export const forgotPasswordLink = css`
+  margin-bottom: 30px;
+  text-align: left;
+`;
+
+export const forgotPasswordWrapper = css`
+  margin: 0 auto;
+  max-width: 375px;
+  padding: 30px;
+  width: 100%;
+`;
+
 export const inputMargin = css`
   margin-bottom: -15px;
 `;

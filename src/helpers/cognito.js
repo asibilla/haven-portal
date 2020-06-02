@@ -1,7 +1,7 @@
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { CognitoIdentityServiceProvider, config } from 'aws-sdk';
 import moment from 'moment';
 
-import { cognitoPool } from '../constants';
+import { cognitoClient, cognitoPool, region } from '../constants';
 import { createError } from '.';
 
 const getServiceProvider = (authData) => {
@@ -220,5 +220,53 @@ export const deleteUser = async ({ authData, username }) => {
     });
   } catch (e) {
     return Promise.reject(e);
+  }
+};
+
+export const forgotPassword = async ({ username }) => {
+  const params = {
+    ClientId: cognitoClient,
+    Username: username,
+  };
+
+  try {
+    config.region = region;
+    const serviceProvider = new CognitoIdentityServiceProvider();
+    return new Promise((resolve, reject) => {
+      serviceProvider.forgotPassword(params, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+export const confirmForgotPassword = async ({ confirmationCode, password, username }) => {
+  const params = {
+    ClientId: cognitoClient,
+    ConfirmationCode: confirmationCode,
+    Password: password,
+    Username: username,
+  };
+
+  try {
+    config.region = region;
+    const serviceProvider = new CognitoIdentityServiceProvider();
+    return new Promise((resolve, reject) => {
+      serviceProvider.confirmForgotPassword(params, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  } catch (err) {
+    return Promise.reject(err);
   }
 };

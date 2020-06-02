@@ -1,10 +1,17 @@
 import React, { useContext, useState } from 'react';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Link, Redirect, useHistory } from 'react-router-dom';
 
 import { routes, styles } from '../../constants';
-import { inputMargin, listStyle, logoWrapper, wrapper } from '../../constants/styles/signin';
+import {
+  forgotPasswordLink,
+  inputMargin,
+  listStyle,
+  logoWrapper,
+  wrapper,
+} from '../../constants/styles/signin';
 import { completePasswordChallenge, getJwt, isAdmin, signIn } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
+import { createUpdateFormValueFn } from '../../helpers/formHelpers';
 import { Button, TextInput } from '../components';
 
 /**
@@ -22,10 +29,6 @@ const UserSignin = () => {
 
   const history = useHistory();
   const { addAuthData, authData } = useContext(AppContext);
-
-  const createUpdateFormValueFn = (updateState) => {
-    return (e) => updateState(e.target.value);
-  };
 
   const onError = (msg) => {
     setFormError(msg);
@@ -81,11 +84,15 @@ const UserSignin = () => {
               value={userName}
             />
             <TextInput
+              className={inputMargin}
               onChange={createUpdateFormValueFn(setPassword)}
               placeholder="Password"
               type="password"
               value={password}
             />
+            <div className={forgotPasswordLink}>
+              <Link to={routes.forgotPassword}>Forgot Password</Link>
+            </div>
             <Button text="submit" type="submit" />
           </form>
         </>
