@@ -10,6 +10,9 @@ const App = ({ url }) => {
   const [authData, updateAuthData] = useState({});
   const [authVerified, setAuthVerified] = useState(false);
 
+  // For storing username on password reset requests
+  const [usernameForReset, setUsernameForReset] = useState('');
+
   useEffect(() => {
     (async () => {
       const auth = await isAuthenticated();
@@ -30,7 +33,15 @@ const App = ({ url }) => {
   const clearAuthData = () => updateAuthData({});
 
   return (
-    <AppContext.Provider value={{ addAuthData, authData, clearAuthData }}>
+    <AppContext.Provider
+      value={{
+        addAuthData,
+        authData,
+        clearAuthData,
+        setUsernameForReset,
+        usernameForReset,
+      }}
+    >
       <BrowserRouter>{authVerified && <ViewWrapper />}</BrowserRouter>
     </AppContext.Provider>
   );

@@ -1,16 +1,18 @@
 import { isEmpty } from 'lodash';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { routes, styles } from '../../constants';
 import { forgotPasswordWrapper } from '../../constants/styles/signin';
 import { forgotPassword } from '../../helpers/cognito';
+import AppContext from '../../helpers/context';
 import { createUpdateFormValueFn } from '../../helpers/formHelpers';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 import { Button, TextInput } from '../components';
 
 const ForgotPassword = () => {
   const history = useHistory();
+  const { setUsernameForReset } = useContext(AppContext);
   const [username, setUsername] = useState('');
   const [errorMsg, setErrorMsg] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
@@ -42,6 +44,7 @@ const ForgotPassword = () => {
     try {
       await forgotPassword({ username });
       setButtonIsDisabled(false);
+      setUsernameForReset(username);
       history.push(routes.confirmForgotPassword);
     } catch (err) {
       setErrorMsg(`Something went wrong: ${err.message}`);

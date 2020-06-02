@@ -152,6 +152,10 @@ export const messageContainer = css`
   min-height: 32px;
 `;
 
+export const noPadding = css`
+  padding: 0;
+`;
+
 export const positonRelative = css`
   position: relative;
 `;
