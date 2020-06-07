@@ -95,8 +95,8 @@ const ManageUsers = ({ url }) => {
           <div className={usersHeaderRow}>
             <div className="username">Username</div>
             <div className="email">Email Address</div>
-            <div>Enabled Status</div>
             <div>User Group</div>
+            <div>Enabled Status</div>
           </div>
 
           {users.map((user) => (
@@ -110,12 +110,12 @@ const ManageUsers = ({ url }) => {
                 <div className="value">{user.email}</div>
               </div>
               <div className="cell">
-                <div className="mobile-label">Enabled Status:</div>
-                <div className="value">{user.enabledStatus}</div>
-              </div>
-              <div className="cell">
                 <div className="mobile-label">User Group:</div>
                 <div className="value">{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
+              </div>
+              <div className="cell">
+                <div className="mobile-label">Enabled Status:</div>
+                <div className="value">{user.enabledStatus}</div>
               </div>
               <div className="manage cell">
                 <Link to={`/admin/manage-user/${user.username}`}>Manage</Link>

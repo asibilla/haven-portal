@@ -44,12 +44,19 @@ class CognitoUser {
   }
 
   get email() {
-    return (this.user.Attributes.find((attribute) => attribute.Name === 'email') || {}).Value;
+    return (
+      (this.user.Attributes || this.user.UserAttributes).find(
+        (attribute) => attribute.Name === 'email'
+      ) || {}
+    ).Value;
   }
 
   get emailVerified() {
-    return (this.user.Attributes.find((attribute) => attribute.Name === 'email_verified') || {})
-      .Value;
+    return (
+      (this.user.Attributes || this.user.UserAttributes).find(
+        (attribute) => attribute.Name === 'email_verified'
+      ) || {}
+    ).Value;
   }
 
   get enabledStatus() {

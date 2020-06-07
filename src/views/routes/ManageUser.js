@@ -3,18 +3,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { styles } from '../../constants';
-import { addNew } from '../../constants/styles/manageUsers';
+import { addNew, userData } from '../../constants/styles/manageUsers';
 import { getUserWithGroups } from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 import { selectUser } from '../../selectors';
 
-import Button from '../components/Button';
 import Spinner from '../components/Spinner';
 
 const ManageUser = ({ url }) => {
   const { id } = useParams();
   const history = useHistory();
-  const { authData, users } = useContext(AppContext);
+  const { authData, setUsers, users } = useContext(AppContext);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState('');
@@ -42,12 +41,32 @@ const ManageUser = ({ url }) => {
     })();
   }, [url]);
 
-  const handleSubmit = () => {
-    setSuccessMsg('User successfully updated!');
-  };
-
   const goBack = () => {
     history.push('/admin/manage-users');
+  };
+
+  const handleDisableUser = async (e) => {
+    e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg(null);
+    setUsers([]);
+
+    // if (
+    //   window.confirm(
+    //     'Are you sure you want to delete this user? This operation cannot be undone.'
+    //   )
+    // ) {
+    //   try {
+    //     setLoading(true);
+    //     await deleteUser({ authData, username: user.username });
+    //     setUsers([]);
+    //     setSuccessMsg('User successfully deleted!');
+    //     setLoading(false);
+    //   } catch (err) {
+    //     setErrorMsg(`User could not be deleted: ${err.message}`);
+    //     setLoading(false);
+    //   }
+    // }
   };
 
   return (
@@ -66,10 +85,57 @@ const ManageUser = ({ url }) => {
         <Spinner />
       ) : (
         <div>
-          <div>{`Username: ${user.username}`}</div>
-          <div>
-            <Button className={styles.buttonSecondary} onClick={goBack} text="Cancel" />
-            <Button onClick={handleSubmit} text="Save" />
+          <div className={userData}>
+            <div className="label">Username:</div>
+            <div className="value">{user.username}</div>
+          </div>
+
+          <div className={userData}>
+            <div className="label">Email:</div>
+            <div className="value">{user.email}</div>
+          </div>
+
+          {user.groups && user.groups.length && (
+            <div className={userData}>
+              <div className="label">User Group:</div>
+              <div className="value">{user.groups[0]}</div>
+            </div>
+          )}
+
+          <div className={userData}>
+            <div className="label">Created:</div>
+            <div className="value">{user.created}</div>
+          </div>
+
+          <div className={userData}>
+            <div className="label">Last Modified:</div>
+            <div className="value">{user.modified}</div>
+          </div>
+
+          <div className={userData}>
+            <div className="label">Enabled Status:</div>
+            <div className="value">{user.enabledStatus}</div>
+          </div>
+
+          <div className={userData}>
+            <div className="label">Status:</div>
+            <div className="value">{user.status}</div>
+          </div>
+
+          <div className={userData}>
+            <div className="label">Actions:</div>
+            <div className="value">
+              <div className="action">
+                <a href="#disable-user" onClick={handleDisableUser}>
+                  Disable User
+                </a>
+              </div>
+              <div className="action">
+                <a href="#reset-user-password" onClick={handleDisableUser}>
+                  Reset User Password
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       )}

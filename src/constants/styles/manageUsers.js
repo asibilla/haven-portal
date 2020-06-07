@@ -2,6 +2,32 @@ import { css, cx } from 'react-emotion';
 
 import { desktop, flexRow, greyBackground, mobile } from './global';
 
+export const addNew = css`
+  margin-bottom: 15px;
+`;
+
+export const addNewWrapper = css`
+  max-width: 375px;
+  padding: 30px;
+  width: 100%;
+`;
+
+export const userData = css`
+  ${flexRow}
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+
+  .label {
+    font-weight: 600;
+    width: 130px;
+  }
+
+  .action {
+    margin-bottom: 8px;
+  }
+`;
+
 const userRowCell = css`
   padding: 5px 15px;
 
@@ -27,13 +53,10 @@ const userRowCell = css`
     justify-content: flex-start;
 
     .mobile-label {
+      font-weight: 600;
       width: 120px;
     }
   }
-`;
-
-export const addNew = css`
-  margin-bottom: 15px;
 `;
 
 export const userRow = cx(
@@ -75,9 +98,3 @@ export const usersHeaderRow = cx(
     }
   `
 );
-
-export const addNewWrapper = css`
-  max-width: 375px;
-  padding: 30px;
-  width: 100%;
-`;
