@@ -1,5 +1,6 @@
 import { string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
@@ -10,8 +11,7 @@ import AddUserForm from '../components/AddUserForm';
 import Spinner from '../components/Spinner';
 
 const ManageUsers = ({ url }) => {
-  const { authData } = useContext(AppContext);
-  const [users, setUsers] = useState([]);
+  const { authData, setUsers, users } = useContext(AppContext);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [isNewUserView, setIsNewUserView] = useState(false);
@@ -30,12 +30,16 @@ const ManageUsers = ({ url }) => {
 
   useEffect(() => {
     (async () => {
-      try {
-        await refreshUsers();
+      if (users.length) {
         setLoading(false);
-      } catch (e) {
-        setErrorMsg(`Something went wrong: ${e.message}`);
-        setLoading(false);
+      } else {
+        try {
+          await refreshUsers();
+          setLoading(false);
+        } catch (e) {
+          setErrorMsg(`Something went wrong: ${e.message}`);
+          setLoading(false);
+        }
       }
     })();
   }, [url]);
@@ -102,7 +106,8 @@ const ManageUsers = ({ url }) => {
               <div>{user.created}</div>
               <div>{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
               <div className="manage">
-                {`Manage${' | '}`}
+                <Link to={`/admin/manage-user/${user.username}`}>Manage</Link>
+                {' | '}
                 <a href="#delete" onClick={createDeleteUserFn(user.username)}>
                   Delete
                 </a>

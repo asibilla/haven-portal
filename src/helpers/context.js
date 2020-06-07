@@ -5,8 +5,10 @@ export const defaultContext = {
   addAuthData: noop,
   authData: {},
   clearAuthData: noop,
-  usernameForReset: '',
   setUsernameForReset: noop,
+  setUsers: noop,
+  usernameForReset: '',
+  users: [],
 };
 
 export default createContext(defaultContext);
