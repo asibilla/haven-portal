@@ -4,7 +4,12 @@ import { useHistory, useParams } from 'react-router-dom';
 
 import { styles } from '../../constants';
 import { addNew, userData } from '../../constants/styles/manageUsers';
-import { getUserWithGroups } from '../../helpers/cognito';
+import {
+  disableUser,
+  enableUser,
+  getUserWithGroups,
+  resetUserPassword,
+} from '../../helpers/cognito';
 import AppContext from '../../helpers/context';
 import { selectUser } from '../../selectors';
 
@@ -49,24 +54,52 @@ const ManageUser = ({ url }) => {
     e.preventDefault();
     setSuccessMsg('');
     setErrorMsg(null);
-    setUsers([]);
+    setLoading(true);
+    try {
+      await disableUser({ authData, username: user.username });
+      await refreshUser();
+      setUsers([]);
+      setSuccessMsg(
+        'User successfully disabled! This user will not have access to the app until re-enabled.'
+      );
+      setLoading(false);
+    } catch (err) {
+      setErrorMsg(`User could not be disabled: ${err.message}`);
+      setLoading(false);
+    }
+  };
 
-    // if (
-    //   window.confirm(
-    //     'Are you sure you want to delete this user? This operation cannot be undone.'
-    //   )
-    // ) {
-    //   try {
-    //     setLoading(true);
-    //     await deleteUser({ authData, username: user.username });
-    //     setUsers([]);
-    //     setSuccessMsg('User successfully deleted!');
-    //     setLoading(false);
-    //   } catch (err) {
-    //     setErrorMsg(`User could not be deleted: ${err.message}`);
-    //     setLoading(false);
-    //   }
-    // }
+  const handleEnableUser = async (e) => {
+    e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg(null);
+    setLoading(true);
+    try {
+      await enableUser({ authData, username: user.username });
+      await refreshUser();
+      setUsers([]);
+      setSuccessMsg('User successfully enabled! This user now has access to the app.');
+      setLoading(false);
+    } catch (err) {
+      setErrorMsg(`User could not be enabled: ${err.message}`);
+      setLoading(false);
+    }
+  };
+
+  const handleResetUserPassword = async (e) => {
+    e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg(null);
+    setLoading(true);
+    try {
+      await resetUserPassword({ authData, username: user.username });
+      setUsers([]);
+      setSuccessMsg('User password reset! User will be prompted to enter new password at login.');
+      setLoading(false);
+    } catch (err) {
+      setErrorMsg(`User could not be enabled: ${err.message}`);
+      setLoading(false);
+    }
   };
 
   return (
@@ -126,12 +159,18 @@ const ManageUser = ({ url }) => {
             <div className="label">Actions:</div>
             <div className="value">
               <div className="action">
-                <a href="#disable-user" onClick={handleDisableUser}>
-                  Disable User
-                </a>
+                {user.isEnabled ? (
+                  <a href="#disable-user" onClick={handleDisableUser}>
+                    Disable User
+                  </a>
+                ) : (
+                  <a href="#enable-user" onClick={handleEnableUser}>
+                    Enable User
+                  </a>
+                )}
               </div>
               <div className="action">
-                <a href="#reset-user-password" onClick={handleDisableUser}>
+                <a href="#reset-user-password" onClick={handleResetUserPassword}>
                   Reset User Password
                 </a>
               </div>

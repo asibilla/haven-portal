@@ -62,6 +62,10 @@ class CognitoUser {
   get enabledStatus() {
     return this.user.Enabled ? 'Enabled' : 'Disabled';
   }
+
+  get isEnabled() {
+    return this.user.Enabled;
+  }
 }
 
 export const getUser = async ({ authData, username }) => {
@@ -316,5 +320,71 @@ export const confirmForgotPassword = async ({ confirmationCode, password, userna
     });
   } catch (err) {
     return Promise.reject(err);
+  }
+};
+
+export const enableUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminEnableUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const disableUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminDisableUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const resetUserPassword = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminResetUserPassword(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
   }
 };
