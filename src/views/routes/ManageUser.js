@@ -52,7 +52,7 @@ const ManageUser = ({ url }) => {
 
   return (
     <div>
-      <h3>Manage Users</h3>
+      <h3>Manage User</h3>
       <div className={styles.messageContainer}>
         {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
         {successMsg && <p className={styles.successText}>{successMsg}</p>}

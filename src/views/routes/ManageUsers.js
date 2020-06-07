@@ -95,19 +95,31 @@ const ManageUsers = ({ url }) => {
           <div className={usersHeaderRow}>
             <div className="username">Username</div>
             <div className="email">Email Address</div>
-            <div>Created</div>
+            <div>Enabled Status</div>
             <div>User Group</div>
           </div>
 
           {users.map((user) => (
             <div className={userRow} key={user.username}>
-              <div className="username">{user.username}</div>
-              <div className="email">{user.email}</div>
-              <div>{user.created}</div>
-              <div>{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
-              <div className="manage">
+              <div className="username cell">
+                <div className="mobile-label">Username:</div>
+                <div className="value">{user.username}</div>
+              </div>
+              <div className="email cell">
+                <div className="mobile-label">Email:</div>
+                <div className="value">{user.email}</div>
+              </div>
+              <div className="cell">
+                <div className="mobile-label">Enabled Status:</div>
+                <div className="value">{user.enabledStatus}</div>
+              </div>
+              <div className="cell">
+                <div className="mobile-label">User Group:</div>
+                <div className="value">{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
+              </div>
+              <div className="manage cell">
                 <Link to={`/admin/manage-user/${user.username}`}>Manage</Link>
-                {' | '}
+                &nbsp;|&nbsp;
                 <a href="#delete" onClick={createDeleteUserFn(user.username)}>
                   Delete
                 </a>

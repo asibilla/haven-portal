@@ -36,7 +36,7 @@ class CognitoUser {
   }
 
   get modified() {
-    return this.user.UserLastModifiedDate.toString();
+    return moment(this.user.UserLastModifiedDate).format('MM-DD-YYYY');
   }
 
   get groups() {
@@ -50,6 +50,10 @@ class CognitoUser {
   get emailVerified() {
     return (this.user.Attributes.find((attribute) => attribute.Name === 'email_verified') || {})
       .Value;
+  }
+
+  get enabledStatus() {
+    return this.user.Enabled ? 'Enabled' : 'Disabled';
   }
 }
 

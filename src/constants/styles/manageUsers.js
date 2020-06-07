@@ -1,17 +1,34 @@
 import { css, cx } from 'react-emotion';
 
-import { flexRow, greyBackground } from './global';
+import { desktop, flexRow, greyBackground, mobile } from './global';
 
 const userRowCell = css`
   padding: 5px 15px;
-  width: 15%;
 
-  &.manage {
-    text-align: right;
+  ${desktop} {
+    width: 15%;
+
+    &.manage {
+      text-align: right;
+    }
+
+    &.email {
+      width: 40%;
+    }
+
+    .mobile-label {
+      display: none;
+    }
   }
 
-  &.email {
-    width: 40%;
+  ${mobile} {
+    ${flexRow}
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .mobile-label {
+      width: 120px;
+    }
   }
 `;
 
@@ -20,16 +37,24 @@ export const addNew = css`
 `;
 
 export const userRow = cx(
-  flexRow,
+  'user-row',
   css`
+    ${desktop} {
+      ${flexRow}
+    }
     align-items: flex-start;
     justify-content: flex-start;
     &:nth-child(even) {
       background-color: ${greyBackground};
     }
 
-    div {
+    .cell {
       ${userRowCell}
+    }
+
+    ${mobile} {
+      padding-bottom: 15px;
+      padding-top: 15px;
     }
   `
 );
@@ -43,6 +68,10 @@ export const usersHeaderRow = cx(
 
     div {
       ${userRowCell}
+    }
+
+    ${mobile} {
+      display: none;
     }
   `
 );
