@@ -36,7 +36,7 @@ class CognitoUser {
   }
 
   get modified() {
-    return this.user.UserLastModifiedDate.toString();
+    return moment(this.user.UserLastModifiedDate).format('MM-DD-YYYY');
   }
 
   get groups() {
@@ -44,14 +44,51 @@ class CognitoUser {
   }
 
   get email() {
-    return (this.user.Attributes.find((attribute) => attribute.Name === 'email') || {}).Value;
+    return (
+      (this.user.Attributes || this.user.UserAttributes).find(
+        (attribute) => attribute.Name === 'email'
+      ) || {}
+    ).Value;
   }
 
   get emailVerified() {
-    return (this.user.Attributes.find((attribute) => attribute.Name === 'email_verified') || {})
-      .Value;
+    return (
+      (this.user.Attributes || this.user.UserAttributes).find(
+        (attribute) => attribute.Name === 'email_verified'
+      ) || {}
+    ).Value;
+  }
+
+  get enabledStatus() {
+    return this.user.Enabled ? 'Enabled' : 'Disabled';
+  }
+
+  get isEnabled() {
+    return this.user.Enabled;
   }
 }
+
+export const getUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminGetUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
 
 export const getUsers = async ({ authData }) => {
   try {
@@ -96,30 +133,45 @@ export const getGroups = async ({ authData }) => {
   }
 };
 
-export const getGroupsForUsers = async ({ authData, users }) => {
+export const getGroupsForUser = async ({ authData, user }) => {
+  const serviceProvider = await getServiceProvider(authData);
+  const params = {
+    UserPoolId: cognitoPool,
+    Username: user.Username,
+  };
   try {
-    const serviceProvider = await getServiceProvider(authData);
-    const promises = users.Users.map((user) => {
-      const params = {
-        UserPoolId: cognitoPool,
-        Username: user.Username,
-      };
-      return new Promise((resolve) => {
-        serviceProvider.adminListGroupsForUser(params, (err, data) => {
-          if (err) {
-            resolve({
-              ...user,
-              groups: [],
-            });
-          } else {
-            resolve({
-              ...user,
-              groups: data.Groups,
-            });
-          }
-        });
+    return new Promise((resolve) => {
+      serviceProvider.adminListGroupsForUser(params, (err, data) => {
+        if (err) {
+          resolve({
+            ...user,
+            groups: [],
+          });
+        } else {
+          resolve({
+            ...user,
+            groups: data.Groups,
+          });
+        }
       });
     });
+  } catch (err) {
+    return Promise.resolve({
+      ...user,
+      groups: [],
+    });
+  }
+};
+
+export const getUserWithGroups = async ({ authData, username }) => {
+  const user = await getUser({ authData, username });
+  const userWithGroups = await getGroupsForUser({ authData, user });
+  return new CognitoUser(userWithGroups);
+};
+
+export const getGroupsForUsers = async ({ authData, users }) => {
+  try {
+    const promises = users.Users.map((user) => getGroupsForUser({ authData, user }));
 
     return Promise.all(promises).then((responses) => {
       return responses.map((response) => new CognitoUser(response));
@@ -268,5 +320,71 @@ export const confirmForgotPassword = async ({ confirmationCode, password, userna
     });
   } catch (err) {
     return Promise.reject(err);
+  }
+};
+
+export const enableUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminEnableUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const disableUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminDisableUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const resetUserPassword = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminResetUserPassword(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
   }
 };

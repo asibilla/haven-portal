@@ -112,7 +112,7 @@ const AddUserForm = ({ onCancel, refresh, url }) => {
         {successMsg && <p className={styles.successText}>{successMsg}</p>}
       </div>
       <div className={addNew}>
-        <a href="#add-new-user" onClick={onCancel}>
+        <a href="#manage-users" onClick={onCancel}>
           {'<< Back'}
         </a>
       </div>

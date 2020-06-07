@@ -1,5 +1,6 @@
 import { string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
@@ -10,8 +11,7 @@ import AddUserForm from '../components/AddUserForm';
 import Spinner from '../components/Spinner';
 
 const ManageUsers = ({ url }) => {
-  const { authData } = useContext(AppContext);
-  const [users, setUsers] = useState([]);
+  const { authData, setUsers, users } = useContext(AppContext);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [isNewUserView, setIsNewUserView] = useState(false);
@@ -30,12 +30,16 @@ const ManageUsers = ({ url }) => {
 
   useEffect(() => {
     (async () => {
-      try {
-        await refreshUsers();
+      if (users.length) {
         setLoading(false);
-      } catch (e) {
-        setErrorMsg(`Something went wrong: ${e.message}`);
-        setLoading(false);
+      } else {
+        try {
+          await refreshUsers();
+          setLoading(false);
+        } catch (e) {
+          setErrorMsg(`Something went wrong: ${e.message}`);
+          setLoading(false);
+        }
       }
     })();
   }, [url]);
@@ -91,18 +95,31 @@ const ManageUsers = ({ url }) => {
           <div className={usersHeaderRow}>
             <div className="username">Username</div>
             <div className="email">Email Address</div>
-            <div>Created</div>
             <div>User Group</div>
+            <div>Enabled Status</div>
           </div>
 
           {users.map((user) => (
             <div className={userRow} key={user.username}>
-              <div className="username">{user.username}</div>
-              <div className="email">{user.email}</div>
-              <div>{user.created}</div>
-              <div>{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
-              <div className="manage">
-                {`Manage${' | '}`}
+              <div className="username cell">
+                <div className="mobile-label">Username:</div>
+                <div className="value">{user.username}</div>
+              </div>
+              <div className="email cell">
+                <div className="mobile-label">Email:</div>
+                <div className="value">{user.email}</div>
+              </div>
+              <div className="cell">
+                <div className="mobile-label">User Group:</div>
+                <div className="value">{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
+              </div>
+              <div className="cell">
+                <div className="mobile-label">Enabled Status:</div>
+                <div className="value">{user.enabledStatus}</div>
+              </div>
+              <div className="manage cell">
+                <Link to={`/admin/manage-user/${user.username}`}>Manage</Link>
+                &nbsp;|&nbsp;
                 <a href="#delete" onClick={createDeleteUserFn(user.username)}>
                   Delete
                 </a>
