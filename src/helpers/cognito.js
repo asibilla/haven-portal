@@ -53,6 +53,28 @@ class CognitoUser {
   }
 }
 
+export const getUser = async ({ authData, username }) => {
+  try {
+    const serviceProvider = await getServiceProvider(authData);
+    const params = {
+      UserPoolId: cognitoPool,
+      Username: username,
+    };
+
+    return new Promise((resolve, reject) => {
+      serviceProvider.adminGetUser(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
 export const getUsers = async ({ authData }) => {
   try {
     const serviceProvider = await getServiceProvider(authData);
@@ -96,30 +118,45 @@ export const getGroups = async ({ authData }) => {
   }
 };
 
-export const getGroupsForUsers = async ({ authData, users }) => {
+export const getGroupsForUser = async ({ authData, user }) => {
+  const serviceProvider = await getServiceProvider(authData);
+  const params = {
+    UserPoolId: cognitoPool,
+    Username: user.Username,
+  };
   try {
-    const serviceProvider = await getServiceProvider(authData);
-    const promises = users.Users.map((user) => {
-      const params = {
-        UserPoolId: cognitoPool,
-        Username: user.Username,
-      };
-      return new Promise((resolve) => {
-        serviceProvider.adminListGroupsForUser(params, (err, data) => {
-          if (err) {
-            resolve({
-              ...user,
-              groups: [],
-            });
-          } else {
-            resolve({
-              ...user,
-              groups: data.Groups,
-            });
-          }
-        });
+    return new Promise((resolve) => {
+      serviceProvider.adminListGroupsForUser(params, (err, data) => {
+        if (err) {
+          resolve({
+            ...user,
+            groups: [],
+          });
+        } else {
+          resolve({
+            ...user,
+            groups: data.Groups,
+          });
+        }
       });
     });
+  } catch (err) {
+    return Promise.resolve({
+      ...user,
+      groups: [],
+    });
+  }
+};
+
+export const getUserWithGroups = async ({ authData, username }) => {
+  const user = await getUser({ authData, username });
+  const userWithGroups = await getGroupsForUser({ authData, user });
+  return new CognitoUser(userWithGroups);
+};
+
+export const getGroupsForUsers = async ({ authData, users }) => {
+  try {
+    const promises = users.Users.map((user) => getGroupsForUser({ authData, user }));
 
     return Promise.all(promises).then((responses) => {
       return responses.map((response) => new CognitoUser(response));
