@@ -6,8 +6,9 @@ import { routes, styles } from '../../constants';
 import { getJwt, isAdmin } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
 import { AdminHeader } from '../components';
+
+import ManageBuyers from './ManageBuyers';
 import AdminOverview from './AdminOverview';
-import ManageOptions from './ManageOptions';
 import ManageUser from './ManageUser';
 import ManageUsers from './ManageUsers';
 
@@ -33,7 +34,7 @@ const AdminHome = ({ url }) => {
       <div className={styles.contentSection}>
         <Switch>
           <Route exact path={match.path} component={AdminOverview} />
-          <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
+          <Route path={`${match.path}${routes.manageBuyers}`} component={ManageBuyers} />
           <Route path={`${match.path}${routes.manageUser}`} component={ManageUser} />
           <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
         </Switch>
