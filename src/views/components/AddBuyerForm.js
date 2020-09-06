@@ -1,16 +1,20 @@
 import { isEmpty, noop } from 'lodash';
 import { func, string } from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import { styles } from '../../constants';
 import { addNew } from '../../constants/styles/manageUsers';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 
+import { getOrgs } from '../../helpers/ajax';
+import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
 import { Button, CheckboxInput, Spinner, TextArea, TextInput } from '.';
 
 const AddBuyerForm = ({ onCancel, refresh, url }) => {
+  const { authData } = useContext(AppContext);
+
   const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -32,6 +36,10 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
   useEffect(() => {
     (async () => {
       try {
+  console.log('the auth data', authData);
+        const { data, error } = await getOrgs(authData.idData.jwtToken);
+        console.log('the data', data);
+        console.log('the error', error); 
         setLoading(false);
       } catch (err) {
         setFormError(`Something went wrong: ${err.message}`);
