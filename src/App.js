@@ -13,6 +13,8 @@ const App = ({ url }) => {
   // For storing username on password reset requests
   const [usernameForReset, setUsernameForReset] = useState('');
   const [users, setUsers] = useState([]);
+  const [buyers, setBuyers] = useState([]);
+  const [orgs, setOrgs] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -38,7 +40,11 @@ const App = ({ url }) => {
       value={{
         addAuthData,
         authData,
+        buyers,
         clearAuthData,
+        orgs,
+        setBuyers,
+        setOrgs,
         setUsernameForReset,
         setUsers,
         usernameForReset,
