@@ -1,4 +1,4 @@
-import { arrayOf, func, node, oneOfType, string } from 'prop-types';
+import { arrayOf, func, node, number, oneOfType, string } from 'prop-types';
 import React from 'react';
 import { cx } from 'react-emotion';
 
@@ -10,7 +10,7 @@ export const DropdownOption = ({ text, value }) => {
 
 DropdownOption.propTypes = {
   text: string.isRequired,
-  value: string.isRequired,
+  value: oneOfType([string, number]).isRequired,
 };
 
 const DropdownMenu = ({

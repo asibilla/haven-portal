@@ -1,35 +1,53 @@
 import { string } from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
 
+import { getConsumers, getOrgs } from '../../helpers/ajax';
+import AppContext from '../../helpers/context';
+
 import AddBuyerForm from '../components/AddBuyerForm';
 import Spinner from '../components/Spinner';
 
 const ManageBuyers = ({ url }) => {
-  const [users, setUsers] = useState([]);
+  const { authData, buyers, orgs, setBuyers, setOrgs } = useContext(AppContext);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [isNewUserView, setIsNewUserView] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const refreshUsers = async () => {
-    setUsers([]);
-    try {
-      console.log('refreshing users');
-    } catch (e) {
-      setErrorMsg(`Something went wrong: ${e.message}`);
-    }
+  const refreshBuyers = async () => {
+    setBuyers([]);
+    const { idData: { jwtToken = '' } = {} } = authData;
+    const promises = [getConsumers({ authToken: jwtToken }), getOrgs({ authToken: jwtToken })];
+
+    return Promise.all(promises)
+      .then((responses) => {
+        responses.forEach(async (response, index) => {
+          const { data, error } = response;
+          if (error || !data || !data.Items) {
+            throw error;
+          } else if (index === 0) {
+            setBuyers(data.Items);
+          } else {
+            setOrgs(data.Items);
+          }
+        });
+      })
+      .catch((err) => {
+        setErrorMsg(`Something went wrong: ${err.message}`);
+      });
   };
 
   useEffect(() => {
     (async () => {
-      if (users.length) {
+      if (buyers.length && orgs.length) {
         setLoading(false);
       } else {
         try {
+          await refreshBuyers();
           setLoading(false);
         } catch (e) {
           setLoading(false);
@@ -52,7 +70,7 @@ const ManageBuyers = ({ url }) => {
   };
 
   if (isNewUserView) {
-    return <AddBuyerForm onCancel={toggleNewUserView(false)} refresh={refreshUsers} />;
+    return <AddBuyerForm onCancel={toggleNewUserView(false)} refresh={refreshBuyers} orgs={orgs} />;
   }
 
   return (
@@ -78,28 +96,30 @@ const ManageBuyers = ({ url }) => {
             <div>Invite Sent Date</div>
           </div>
 
-          {users.map((user) => (
-            <div className={userRow} key={user.username}>
+          {buyers.map((buyer) => (
+            <div className={userRow} key={buyer.EmailAddress}>
               <div className="username cell">
-                <div className="mobile-label">Username:</div>
-                <div className="value">{user.username}</div>
+                <div className="mobile-label">Name:</div>
+                <div className="value">{`${buyer.FirstName} ${buyer.LastName}`}</div>
               </div>
               <div className="email cell">
                 <div className="mobile-label">Email:</div>
-                <div className="value">{user.email}</div>
+                <div className="value">{buyer.EmailAddress}</div>
               </div>
               <div className="cell">
-                <div className="mobile-label">User Group:</div>
-                <div className="value">{user.groups.length ? `${user.groups[0]}` : 'none'}</div>
+                <div className="mobile-label">Status:</div>
+                <div className="value">placeholder for status</div>
               </div>
               <div className="cell">
-                <div className="mobile-label">Enabled Status:</div>
-                <div className="value">{user.enabledStatus}</div>
+                <div className="mobile-label">Invite Sent Date:</div>
+                <div className="value">
+                  {buyer.InviteSentDate ? `${buyer.InviteSentDate}` : 'unknown'}
+                </div>
               </div>
               <div className="manage cell">
-                <Link to={`/admin/manage-user/${user.username}`}>Manage</Link>
+                <Link to={`/admin/manage-user/${buyer.username}`}>Manage</Link>
                 &nbsp;|&nbsp;
-                <a href="#delete" onClick={createDeleteUserFn(user.username)}>
+                <a href="#delete" onClick={createDeleteUserFn(buyer.username)}>
                   Delete
                 </a>
               </div>
