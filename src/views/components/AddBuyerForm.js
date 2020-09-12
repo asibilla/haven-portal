@@ -1,6 +1,6 @@
 import { isEmpty, noop } from 'lodash';
-import { func, string } from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import { arrayOf, func, shape } from 'prop-types';
+import React, { Fragment, useState } from 'react';
 
 import { styles } from '../../constants';
 import { addNew } from '../../constants/styles/manageUsers';
@@ -8,9 +8,18 @@ import { buttonContainer, formContainer, formSection } from '../../constants/sty
 
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import { Button, CheckboxInput, Spinner, TextArea, TextInput } from '.';
+import {
+  Button,
+  CheckboxInput,
+  DropdownMenu,
+  DropdownOption,
+  Spinner,
+  TextArea,
+  TextInput,
+} from '.';
 
-const AddBuyerForm = ({ onCancel, refresh, url }) => {
+const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
+  const [property, setProperty] = useState('');
   const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -26,19 +35,8 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [formError, setFormError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(false);
-      } catch (err) {
-        setFormError(`Something went wrong: ${err.message}`);
-        setLoading(false);
-      }
-    })();
-  }, [url]);
 
   const setValue = (setState) => {
     return (e) => {
@@ -60,6 +58,7 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
 
   const handleSubmit = async (e) => {
     setButtonIsDisabled(true);
+    setLoading(true);
     setValidationErrors({});
     e.preventDefault();
 
@@ -89,6 +88,7 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
     if (!isEmpty(errors)) {
       setValidationErrors(errors);
       setButtonIsDisabled(false);
+      setLoading(false);
       return;
     }
 
@@ -101,6 +101,8 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
       setFormError(`Something went wrong: ${err}`);
       setButtonIsDisabled(false);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -120,6 +122,20 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
       ) : (
         <form className={formContainer} onSubmit={handleSubmit}>
           <div className={formSection}>
+            <DropdownMenu
+              id="property"
+              label="Property"
+              onChange={setValue(setProperty)}
+              value={property}
+            >
+              <DropdownOption text="" value="" />
+              {orgs &&
+                orgs.map((org) => (
+                  <Fragment key={org.OrgId}>
+                    <DropdownOption text={org.Name} value={org.OrgId} />
+                  </Fragment>
+                ))}
+            </DropdownMenu>
             <TextInput
               labelText="Salutation"
               onChange={setValue(setSalutation)}
@@ -191,13 +207,13 @@ const AddBuyerForm = ({ onCancel, refresh, url }) => {
 };
 
 AddBuyerForm.defaultProps = {
-  url: '',
+  orgs: null,
 };
 
 AddBuyerForm.propTypes = {
   onCancel: func.isRequired,
+  orgs: arrayOf(shape({})),
   refresh: func.isRequired,
-  url: string,
 };
 
 export default AddBuyerForm;
