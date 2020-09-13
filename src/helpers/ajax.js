@@ -37,3 +37,17 @@ export const getConsumers = async ({ authToken }) => {
     return { error };
   }
 };
+
+export const addConsumer = async ({ authToken, body }) => {
+  try {
+    const { data } = await APIGateway.post('/consumers', body, {
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+};
