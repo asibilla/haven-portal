@@ -21,7 +21,7 @@ import {
 } from '.';
 
 const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
-  const [property, setProperty] = useState('');
+  const [org, setOrg] = useState('');
   const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -103,7 +103,7 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
        * TODO: add PropertyId
        */
       const requestBody = {
-        OrgId: 848,
+        OrgId: org,
         PropertyId: null,
         Salutation: salutation,
         FirstName: firstName,
@@ -148,17 +148,12 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
       ) : (
         <form className={formContainer} onSubmit={handleSubmit}>
           <div className={formSection}>
-            <DropdownMenu
-              id="property"
-              label="Property"
-              onChange={setValue(setProperty)}
-              value={property}
-            >
+            <DropdownMenu id="org" label="Org" onChange={setValue(setOrg)} value={org}>
               <DropdownOption text="" value="" />
               {orgs &&
-                orgs.map((org) => (
-                  <Fragment key={org.OrgId}>
-                    <DropdownOption text={org.Name} value={org.OrgId} />
+                orgs.map((o) => (
+                  <Fragment key={o.OrgId}>
+                    <DropdownOption text={o.Name} value={o.OrgId} />
                   </Fragment>
                 ))}
             </DropdownMenu>
