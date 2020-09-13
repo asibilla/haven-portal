@@ -1,6 +1,5 @@
 import { string } from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
@@ -15,7 +14,7 @@ const ManageBuyers = ({ url }) => {
   const { authData, buyers, orgs, setBuyers, setOrgs } = useContext(AppContext);
   const [errorMsg, setErrorMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState('');
-  const [isNewUserView, setIsNewUserView] = useState(false);
+  const [isNewBuyerView, setIsNewBuyerView] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const refreshBuyers = async () => {
@@ -59,7 +58,7 @@ const ManageBuyers = ({ url }) => {
   const toggleNewUserView = (show = true) => {
     return (e) => {
       e.preventDefault();
-      setIsNewUserView(show);
+      setIsNewBuyerView(show);
     };
   };
 
@@ -69,7 +68,7 @@ const ManageBuyers = ({ url }) => {
     };
   };
 
-  if (isNewUserView) {
+  if (isNewBuyerView) {
     return <AddBuyerForm onCancel={toggleNewUserView(false)} refresh={refreshBuyers} orgs={orgs} />;
   }
 
@@ -78,7 +77,7 @@ const ManageBuyers = ({ url }) => {
       <h3>Manage Buyers</h3>
       <div className={styles.messageContainer}>
         {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
-        {successMsg && <p className={styles.successText}>{successMsg}</p>}
+        {successMsg && <p className={sLinktyles.successText}>{successMsg}</p>}
       </div>
       {loading ? (
         <Spinner />
@@ -117,7 +116,7 @@ const ManageBuyers = ({ url }) => {
                 </div>
               </div>
               <div className="manage cell">
-                <Link to={`/admin/manage-user/${buyer.username}`}>Manage</Link>
+                <a href="#manage">Manage</a>
                 &nbsp;|&nbsp;
                 <a href="#delete" onClick={createDeleteUserFn(buyer.username)}>
                   Delete
