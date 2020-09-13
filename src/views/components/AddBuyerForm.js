@@ -1,11 +1,13 @@
 import { isEmpty, noop } from 'lodash';
 import { arrayOf, func, shape } from 'prop-types';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 
 import { styles } from '../../constants';
 import { addNew } from '../../constants/styles/manageUsers';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 
+import { addConsumer } from '../../helpers/ajax';
+import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
 import {
@@ -38,6 +40,8 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
+  const { authData } = useContext(AppContext);
+
   const setValue = (setState) => {
     return (e) => {
       setState(e.target.value);
@@ -60,6 +64,7 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
     setButtonIsDisabled(true);
     setLoading(true);
     setValidationErrors({});
+    setFormError(null);
     e.preventDefault();
 
     const validationObj = [
@@ -93,6 +98,27 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
     }
 
     try {
+      const { idData: { jwtToken = '' } = {} } = authData;
+      /**
+       * TODO: add PropertyId
+       */
+      const requestBody = {
+        OrgId: 848,
+        PropertyId: null,
+        Salutation: salutation,
+        FirstName: firstName,
+        LastName: lastName,
+        Suffix: suffix,
+        EmailAddress: email,
+        EmailOptIn: false,
+        SendInvite: sendInvite,
+      };
+
+      const { error } = await addConsumer({ authToken: jwtToken, body: requestBody });
+      if (error) {
+        throw error;
+      }
+
       refresh();
       setButtonIsDisabled(false);
       setSuccessMsg('User successfully created!');
