@@ -77,7 +77,7 @@ const ManageBuyers = ({ url }) => {
       <h3>Manage Buyers</h3>
       <div className={styles.messageContainer}>
         {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
-        {successMsg && <p className={sLinktyles.successText}>{successMsg}</p>}
+        {successMsg && <p className={styles.successText}>{successMsg}</p>}
       </div>
       {loading ? (
         <Spinner />
