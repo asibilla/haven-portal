@@ -51,3 +51,17 @@ export const addConsumer = async ({ authToken, body }) => {
     return { error };
   }
 };
+
+export const getProperties = async ({ authToken, orgId }) => {
+  try {
+    const { data } = await APIGateway.get(`/properties?id=${orgId}`, {
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+};
