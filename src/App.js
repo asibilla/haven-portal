@@ -15,6 +15,7 @@ const App = ({ url }) => {
   const [users, setUsers] = useState([]);
   const [buyers, setBuyers] = useState([]);
   const [orgs, setOrgs] = useState([]);
+  const [properties, setProperties] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -43,8 +44,10 @@ const App = ({ url }) => {
         buyers,
         clearAuthData,
         orgs,
+        properties,
         setBuyers,
         setOrgs,
+        setProperties,
         setUsernameForReset,
         setUsers,
         usernameForReset,

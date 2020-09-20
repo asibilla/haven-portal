@@ -5,6 +5,7 @@ const routes = {
   manageBuyer: '/manage-buyer/:id',
   manageBuyers: '/manage-buyers',
   manageOptions: '/manage-options',
+  manageProperties: '/manage-properties',
   manageUser: '/manage-user/:id',
   manageUsers: '/manage-users',
   resetPassword: '/reset-password',
