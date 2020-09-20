@@ -1,5 +1,6 @@
 import { string } from 'prop-types';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { css } from 'react-emotion';
 
 import { styles } from '../../constants';
 import { addNew, userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
@@ -10,6 +11,10 @@ import AppContext from '../../helpers/context';
 import { Button, DropdownMenu, DropdownOption } from '../components';
 import AddBuyerForm from '../components/AddBuyerForm';
 import Spinner from '../components/Spinner';
+
+const buttonContainer = css`
+  margin-bottom: 20px;
+`;
 
 const ManageProperties = ({ url }) => {
   const { authData, properties, orgs, setProperties, setOrgs } = useContext(AppContext);
@@ -22,7 +27,6 @@ const ManageProperties = ({ url }) => {
 
   const dateFormatter = new Intl.DateTimeFormat('en-US');
 
-  
   const fetchOrgs = async () => {
     try {
       const { idData: { jwtToken = '' } = {} } = authData;
@@ -31,9 +35,7 @@ const ManageProperties = ({ url }) => {
         throw error || new Error('No org data found.');
       }
       setOrgs(data.Items);
-
-    }
-    catch(err) {
+    } catch (err) {
       setErrorMsg(`Something went wrong: ${err.message}`);
     }
   };
@@ -42,8 +44,7 @@ const ManageProperties = ({ url }) => {
     setSelectedOrg(e.target.value);
     if (e.target.value) {
       setButtonDisabled(false);
-    }
-    else {
+    } else {
       setButtonDisabled(true);
     }
   };
@@ -61,8 +62,7 @@ const ManageProperties = ({ url }) => {
       }
       setProperties(data.Items);
       setLoading(false);
-    }
-    catch(err) {
+    } catch (err) {
       setErrorMsg(`Something went wrong: ${err.message}`);
       setLoading(false);
     }
@@ -97,7 +97,9 @@ const ManageProperties = ({ url }) => {
   };
 
   if (isNewBuyerView) {
-    return <AddBuyerForm onCancel={toggleNewPropertyView(false)} refresh={getProperties} orgs={orgs} />;
+    return (
+      <AddBuyerForm onCancel={toggleNewPropertyView(false)} refresh={getProperties} orgs={orgs} />
+    );
   }
 
   return (
@@ -117,22 +119,29 @@ const ManageProperties = ({ url }) => {
             </a>
           </div>
 
-          { orgs.length && (
+          {orgs.length && (
             <>
-            <DropdownMenu id="org" label="Select an Org" onChange={selectOrg} value={selectedOrg}>
-              <DropdownOption text="" value="" />
-              {orgs &&
-                orgs.map((o) => (
-                  <Fragment key={o.OrgId}>
-                    <DropdownOption text={o.Name} value={o.OrgId} />
-                  </Fragment>
-                ))}
-            </DropdownMenu>
-            <Button disabled={buttonDisabled} onClick={fetchProperties} text="Get Properties" type="button" />
+              <DropdownMenu id="org" label="Select an Org" onChange={selectOrg} value={selectedOrg}>
+                <DropdownOption text="" value="" />
+                {orgs &&
+                  orgs.map((o) => (
+                    <Fragment key={o.OrgId}>
+                      <DropdownOption text={o.Name} value={o.OrgId} />
+                    </Fragment>
+                  ))}
+              </DropdownMenu>
+              <div className={buttonContainer}>
+                <Button
+                  disabled={buttonDisabled}
+                  onClick={fetchProperties}
+                  text="Get Properties"
+                  type="button"
+                />
+              </div>
             </>
           )}
 
-          { properties.length > 0 && (
+          {properties.length > 0 && (
             <>
               <div className={usersHeaderRow}>
                 <div className="username">Lot</div>
