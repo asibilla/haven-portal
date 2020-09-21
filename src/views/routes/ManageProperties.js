@@ -9,7 +9,7 @@ import { getOrgs, getProperties } from '../../helpers/ajax';
 import AppContext from '../../helpers/context';
 
 import { Button, DropdownMenu, DropdownOption } from '../components';
-import AddBuyerForm from '../components/AddBuyerForm';
+import AddPropertyForm from '../components/AddPropertyForm';
 import Spinner from '../components/Spinner';
 
 const buttonContainer = css`
@@ -98,7 +98,11 @@ const ManageProperties = ({ url }) => {
 
   if (isNewBuyerView) {
     return (
-      <AddBuyerForm onCancel={toggleNewPropertyView(false)} refresh={getProperties} orgs={orgs} />
+      <AddPropertyForm
+        onCancel={toggleNewPropertyView(false)}
+        refresh={getProperties}
+        orgs={orgs}
+      />
     );
   }
 
