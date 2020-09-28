@@ -13,3 +13,8 @@ export const optionPropType = {
   productDescription: string,
   sellPrice: number,
 };
+
+export const orgPropType = {
+  id: string.isRequired,
+  orgName: string.isRequired,
+};

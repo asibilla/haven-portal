@@ -31,6 +31,18 @@ export const userData = css`
 const userRowCell = css`
   padding: 5px 15px;
 
+  &.half {
+    width: 50%;
+  }
+
+  &.three-quarters {
+    width: 75%;
+  }
+
+  &.one-quarter {
+    width: 25%;
+  }
+
   ${desktop} {
     width: 15%;
 
