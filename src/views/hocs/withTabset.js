@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 import { func, string } from 'prop-types';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { cx } from 'react-emotion';
 
 import { styles } from '../../constants';
@@ -8,9 +8,8 @@ import { content, tab, tabset } from '../../constants/styles/tabset';
 
 import AppContext from '../../helpers/context';
 import { deleteItem, scanDB } from '../../helpers/db';
-import { deleteImage } from '../../helpers/s3';
 
-import { DropdownMenu, DropdownOption, Spinner } from '../components';
+import { Spinner } from '../components';
 
 const ADD_NEW = 'add-new';
 const MANAGE = 'manage';
@@ -25,7 +24,6 @@ class Tabset extends Component {
     editIsActive: false,
     loading: true,
     selectedItem: null,
-    selectedItemKey: '',
     successMessage: '',
   };
 
@@ -34,9 +32,9 @@ class Tabset extends Component {
 
     this.deleteItem = this.deleteItem.bind(this);
     this.refreshData = this.refreshData.bind(this);
+    this.setEditIsActive = this.setEditIsActive.bind(this);
+    this.setSelectedItem = this.setSelectedItem.bind(this);
     this.showEditView = this.showEditView.bind(this);
-    this.updateSelectedItem = this.updateSelectedItem.bind(this);
-    this.updateSelectedItemKey = this.updateSelectedItemKey.bind(this);
     this.updateSuccessMessage = this.updateSuccessMessage.bind(this);
   }
 
@@ -58,6 +56,14 @@ class Tabset extends Component {
     );
   }
 
+  async setSelectedItem(item) {
+    await this.setState({ selectedItem: item });
+  }
+
+  setEditIsActive(active) {
+    this.setState({ editIsActive: active });
+  }
+
   getTabState(tabName) {
     const { addNewIsActive } = this.state;
     if ((tabName === ADD_NEW && addNewIsActive) || (tabName === MANAGE && !addNewIsActive)) {
@@ -74,18 +80,13 @@ class Tabset extends Component {
       window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')
     ) {
       const item = {
-        optionType: get(selectedItem, 'optionType', null),
         [primaryKey]: get(selectedItem, primaryKey, null),
       };
 
       try {
         await deleteItem({ authData, item, tableName });
-        if (selectedItem.imageKey) {
-          await deleteImage({ authData, key: selectedItem.imageKey });
-        }
         this.setState({
           selectedItem: null,
-          selectedItemKey: '',
           successMessage: 'Your item was successfully deleted',
         });
         this.refreshData();
@@ -103,9 +104,7 @@ class Tabset extends Component {
       {
         dataItems: [],
         dbError: null,
-        loading: true,
         selectedItem: null,
-        selectedItemKey: '',
       },
       async () => {
         try {
@@ -131,21 +130,6 @@ class Tabset extends Component {
     };
   }
 
-  updateSelectedItem() {
-    const { displayKey } = this.props;
-    const { dataItems, selectedItemKey } = this.state;
-
-    const selectedItem =
-      dataItems.find((item) => get(item, displayKey, '') === selectedItemKey) || null;
-    this.setState({ dbError: null, selectedItem, successMessage: '' });
-  }
-
-  updateSelectedItemKey(e) {
-    this.setState({ selectedItemKey: e.target.value }, () => {
-      this.updateSelectedItem();
-    });
-  }
-
   updateSuccessMessage(message) {
     this.setState({ successMessage: message });
   }
@@ -155,7 +139,7 @@ class Tabset extends Component {
   }
 
   render() {
-    const { displayKey, WrappedComponent } = this.props;
+    const { WrappedComponent } = this.props;
     const {
       addNewIsActive,
       dataItems,
@@ -163,7 +147,6 @@ class Tabset extends Component {
       editIsActive,
       loading,
       selectedItem,
-      selectedItemKey,
       successMessage,
     } = this.state;
 
@@ -196,32 +179,19 @@ class Tabset extends Component {
             <div className={styles.messageContainer}>
               {dbError && <p className={styles.errorText}>{dbError}</p>}
             </div>
-            {!addNewIsActive && !editIsActive && (
-              <DropdownMenu
-                id="item-select"
-                onChange={this.updateSelectedItemKey}
-                value={selectedItemKey}
-              >
-                <DropdownOption text="-- Select an Item to Manage --" value="" disabled />
-                {dataItems.map((item) => {
-                  const val = get(item, displayKey);
-                  return (
-                    <Fragment key={val}>
-                      <DropdownOption text={val} value={val} />
-                    </Fragment>
-                  );
-                })}
-              </DropdownMenu>
-            )}
             <div className={styles.messageContainer}>
               {successMessage && <p className={styles.successText}>{successMessage}</p>}
             </div>
             {selectedItem && !editIsActive && !addNewIsActive && this.editDeleteBlock}
             <WrappedComponent
               addNewIsActive={addNewIsActive}
+              dataItems={dataItems}
+              deleteItem={this.deleteItem}
               editIsActive={editIsActive}
               refreshData={this.refreshData}
               selectedItem={selectedItem}
+              setEditIsActive={this.setEditIsActive}
+              setSelectedItem={this.setSelectedItem}
               showEditView={this.showEditView}
               updateSuccessMessage={this.updateSuccessMessage}
             />
@@ -233,7 +203,6 @@ class Tabset extends Component {
 }
 
 Tabset.propTypes = {
-  displayKey: string.isRequired,
   primaryKey: string.isRequired,
   tableName: string.isRequired,
   WrappedComponent: func.isRequired,
