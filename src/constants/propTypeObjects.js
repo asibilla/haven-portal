@@ -18,3 +18,14 @@ export const orgPropType = {
   id: string.isRequired,
   orgName: string.isRequired,
 };
+
+export const propertyPropType = {
+  closeOfEscrow: string,
+  id: string.isRequired,
+  lot: string,
+  model: string,
+  org: string,
+  phase: string,
+  propertyName: string.isRequired,
+  tract: string,
+};

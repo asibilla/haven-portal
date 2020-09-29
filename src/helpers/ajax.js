@@ -65,7 +65,3 @@ export const getProperties = async ({ authToken, orgId }) => {
     return { error };
   }
 };
-
-export const addProperty = ({ authToken, body }) => {
-  console.log(authToken, body);
-};

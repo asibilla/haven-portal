@@ -3,7 +3,7 @@ import React from 'react';
 
 import OrgForm from '../components/OrgForm';
 import OrgView from '../components/OrgView';
-import { optionPropType, orgPropType } from '../../constants/propTypeObjects';
+import { orgPropType } from '../../constants/propTypeObjects';
 import withTabset from '../hocs/withTabset';
 
 const ManageOrgsComponent = ({
@@ -54,7 +54,7 @@ ManageOrgsComponent.propTypes = {
   deleteItem: func.isRequired,
   editIsActive: bool,
   refreshData: func.isRequired,
-  selectedItem: shape(optionPropType),
+  selectedItem: shape(orgPropType),
   setEditIsActive: func.isRequired,
   setSelectedItem: func.isRequired,
   showEditView: func.isRequired,

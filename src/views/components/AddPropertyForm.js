@@ -1,20 +1,27 @@
-import { isEmpty } from 'lodash';
-import { arrayOf, func, shape } from 'prop-types';
-import React, { Fragment, useContext, useState } from 'react';
+import { isEmpty, noop } from 'lodash';
+import { func, shape, string } from 'prop-types';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 
 import { styles } from '../../constants';
-import { addNew } from '../../constants/styles/manageUsers';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
+import { optionPropType } from '../../constants/propTypeObjects';
 
-import { addProperty } from '../../helpers/ajax';
 import AppContext from '../../helpers/context';
+import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import { Button, DropdownMenu, DropdownOption, Spinner, TextInput } from '.';
+import { Button, DropdownMenu, DropdownOption, TextInput } from '.';
 
-const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
+const AddPropertyForm = ({
+  refreshData,
+  selectedItem,
+  showEditView,
+  updateSuccessMessage,
+  url,
+}) => {
   const [org, setOrg] = useState('');
-  const [name, setName] = useState('');
+  const [propertyName, setName] = useState('');
   const [model, setModel] = useState('');
   const [tract, setTract] = useState('');
   const [phase, setPhase] = useState('');
@@ -23,11 +30,22 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const [formError, setFormError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState('');
 
-  const { authData } = useContext(AppContext);
+  const { authData, orgs } = useContext(AppContext);
+
+  useEffect(() => {
+    if (selectedItem) {
+      setOrg(selectedItem.org);
+      setName(selectedItem.propertyName);
+      setModel(selectedItem.model);
+      setTract(selectedItem.tract);
+      setPhase(selectedItem.phase);
+      setLot(selectedItem.lot);
+      setCloseOfEscrow(selectedItem.closeOfEscrow);
+    }
+  }, [url]);
 
   const setValue = (setState) => {
     return (e) => {
@@ -43,23 +61,27 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
 
   const handleSubmit = async (e) => {
     setButtonIsDisabled(true);
-    setLoading(true);
     setValidationErrors({});
-    setFormError(null);
     e.preventDefault();
 
     const validationObj = [
       new ValidationItem({
         displayName: 'Name',
-        fieldName: 'name',
+        fieldName: 'propertyName',
         isRequiredString: true,
-        value: name,
+        value: propertyName,
       }),
       new ValidationItem({
         displayName: 'Lot',
         fieldName: 'lot',
         isRequiredString: true,
         value: lot,
+      }),
+      new ValidationItem({
+        displayName: 'Org',
+        fieldName: 'org',
+        isRequiredString: true,
+        value: org,
       }),
     ];
 
@@ -68,102 +90,135 @@ const AddBuyerForm = ({ onCancel, orgs, refresh }) => {
     if (!isEmpty(errors)) {
       setValidationErrors(errors);
       setButtonIsDisabled(false);
-      setLoading(false);
       return;
     }
 
-    try {
-      const { idData: { jwtToken = '' } = {} } = authData;
-      const requestBody = {
-        Name: name,
+    const id = selectedItem ? selectedItem.id : v4();
+
+    if (selectedItem) {
+      const queryItems = [
+        new DBQueryItem({ id: ':a', key: 'org', value: org }),
+        new DBQueryItem({ id: ':b', key: 'propertyName', value: propertyName }),
+        new DBQueryItem({ id: ':d', key: 'model', value: model }),
+        new DBQueryItem({ id: ':e', key: 'tract', value: tract }),
+        new DBQueryItem({ id: ':f', key: 'phase', value: phase }),
+        new DBQueryItem({ id: ':g', key: 'lot', value: lot }),
+        new DBQueryItem({ id: ':j', key: 'closeOfEscrow', value: closeOfEscrow }),
+      ];
+
+      const keyItems = {
+        id,
       };
 
-      const { error } = await addProperty({ authToken: jwtToken, body: requestBody });
-      if (error) {
-        throw error;
+      try {
+        await updateItem({ authData, items: queryItems, keyItems, tableName: 'properties' });
+        updateSuccessMessage('Option successfully updated!');
+        await refreshData();
+        showEditView(false)();
+      } catch (err) {
+        setSubmitError(`An error occured: ${err.message}`);
+        setButtonIsDisabled(false);
       }
+    } else {
+      const item = {
+        id,
+        closeOfEscrow,
+        lot,
+        model,
+        org,
+        phase,
+        propertyName,
+        tract,
+      };
 
-      refresh();
-      clearState();
-      setSuccessMsg('Property was successfully added!');
-      setButtonIsDisabled(false);
-    } catch (err) {
-      setFormError(`Something went wrong: ${err}`);
+      try {
+        await putItem({ authData, item, tableName: 'properties' });
+        setSubmitSuccess('Your property has been added!');
+        clearState();
+        refreshData();
+      } catch (err) {
+        setSubmitError(`An error occured: ${err.message}`);
+      }
       setButtonIsDisabled(false);
     }
-
-    setLoading(false);
   };
 
   return (
     <div>
-      <h3>Add New Property</h3>
-      <div className={styles.messageContainer}>
-        {formError && <p className={styles.errorText}>{formError}</p>}
-        {successMsg && <p className={styles.successText}>{successMsg}</p>}
-      </div>
-      <div className={addNew}>
-        <a href="#manage-properties" onClick={onCancel}>
-          {'<< Back'}
-        </a>
-      </div>
-      {loading ? (
-        <Spinner />
-      ) : (
-        <form className={formContainer} onSubmit={handleSubmit}>
-          <div className={formSection}>
-            <DropdownMenu id="org" label="Org" onChange={setValue(setOrg)} value={org}>
-              <DropdownOption text="" value="" />
-              {orgs &&
-                orgs.map((o) => (
-                  <Fragment key={o.OrgId}>
-                    <DropdownOption text={o.Name} value={o.OrgId} />
-                  </Fragment>
-                ))}
-            </DropdownMenu>
-            <TextInput
-              error={validationErrors.name}
-              labelText="Name"
-              onChange={setValue(setName)}
-              value={name}
-            />
-            <TextInput labelText="Model" onChange={setValue(setModel)} value={model} />
-            <TextInput labelText="Tract" onChange={setValue(setTract)} value={tract} />
-          </div>
+      <h3>{selectedItem ? 'Edit Property' : 'Add a New Property'}</h3>
+      <form className={formContainer} onSubmit={handleSubmit}>
+        <div className={formSection}>
+          <DropdownMenu
+            error={validationErrors.org}
+            id="org"
+            label="Org"
+            onChange={setValue(setOrg)}
+            value={org}
+          >
+            <DropdownOption text="" value="" />
+            {orgs &&
+              orgs.map((o) => (
+                <Fragment key={o.id}>
+                  <DropdownOption text={o.orgName} value={o.id} />
+                </Fragment>
+              ))}
+          </DropdownMenu>
+          <TextInput
+            error={validationErrors.propertyName}
+            labelText="Name"
+            onChange={setValue(setName)}
+            value={propertyName}
+          />
+          <TextInput labelText="Model" onChange={setValue(setModel)} value={model} />
+          <TextInput labelText="Tract" onChange={setValue(setTract)} value={tract} />
+        </div>
 
-          <div className={formSection}>
-            <TextInput labelText="Phase" onChange={setValue(setPhase)} value={phase} />
-            <TextInput
-              error={validationErrors.lot}
-              labelText="Lot"
-              onChange={setValue(setLot)}
-              value={lot}
-            />
-            <TextInput
-              labelText="Close of Escrow"
-              onChange={setValue(setCloseOfEscrow)}
-              value={closeOfEscrow}
-            />
+        <div className={formSection}>
+          <TextInput labelText="Phase" onChange={setValue(setPhase)} value={phase} />
+          <TextInput
+            error={validationErrors.lot}
+            labelText="Lot"
+            onChange={setValue(setLot)}
+            value={lot}
+          />
+          <TextInput
+            labelText="Close of Escrow"
+            onChange={setValue(setCloseOfEscrow)}
+            value={closeOfEscrow}
+          />
 
-            <div className={buttonContainer}>
-              <Button className={styles.buttonSecondary} onClick={onCancel} text="Cancel" />
-              <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
-            </div>
+          <div className={buttonContainer}>
+            {selectedItem && (
+              <Button
+                className={styles.buttonSecondary}
+                disabled={buttonIsDisabled}
+                onClick={showEditView(false)}
+                text="Cancel"
+              />
+            )}
+            <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
           </div>
-        </form>
-      )}
+          {submitError && <div className={styles.errorText}>{submitError}</div>}
+          {submitSuccess && <div className={styles.successText}>{submitSuccess}</div>}
+        </div>
+      </form>
     </div>
   );
 };
 
-AddBuyerForm.defaultProps = {
-  orgs: null,
+AddPropertyForm.defaultProps = {
+  selectedItem: null,
+  showEditView: noop,
+  updateSuccessMessage: noop,
+  url: '',
 };
 
-AddBuyerForm.propTypes = {
-  onCancel: func.isRequired,
-  orgs: arrayOf(shape({})),
-  refresh: func.isRequired,
+AddPropertyForm.propTypes = {
+  refreshData: func.isRequired,
+  selectedItem: shape(optionPropType),
+  showEditView: func,
+  updateSuccessMessage: func,
+  url: string,
 };
 
-export default AddBuyerForm;
+export default AddPropertyForm;

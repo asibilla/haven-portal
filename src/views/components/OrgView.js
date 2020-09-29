@@ -29,6 +29,7 @@ const ManageProperties = ({ deleteItem, orgs, setEditIsActive, setSelectedItem }
         <Spinner />
       ) : (
         <div>
+          <h3>Manage Orgs</h3>
           {orgs.length > 0 && (
             <>
               <div className={usersHeaderRow}>
