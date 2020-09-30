@@ -29,3 +29,13 @@ export const propertyPropType = {
   propertyName: string.isRequired,
   tract: string,
 };
+
+export const buyerPropType = {
+  emailAddress: string.isRequired,
+  firstName: string.isRequired,
+  lastName: string.isRequired,
+  orgId: string,
+  propertyId: string,
+  salutation: string,
+  suffix: string,
+};
