@@ -3,27 +3,27 @@ import React, { useState } from 'react';
 
 import { styles } from '../../constants';
 import { userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
-import { propertyPropType } from '../../constants/propTypeObjects';
+import { buyerPropType } from '../../constants/propTypeObjects';
+
+import { formatDate } from '../../helpers';
 
 import OrgFilter from './OrgFilter';
 import Spinner from './Spinner';
 
-const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelectedItem }) => {
+const BuyersView = ({ deleteItem, buyers, setEditIsActive, setSelectedItem }) => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOrg, setSelectedOrg] = useState('');
 
-  const dateFormatter = new Intl.DateTimeFormat('en-US');
-
-  const createManageFn = (property) => () => {
-    setSelectedItem(property);
+  const createManageFn = (org) => () => {
+    setSelectedItem(org);
     setEditIsActive(true);
   };
 
-  const createDeleteUserFn = (property) => {
+  const createDeleteBuyerFn = (org) => {
     return async () => {
       setLoading(true);
-      await setSelectedItem(property);
+      await setSelectedItem(org);
       await deleteItem();
       setLoading(false);
     };
@@ -31,7 +31,7 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
 
   return (
     <div>
-      <h3>Manage Properties</h3>
+      <h3>Manage Buyers</h3>
       <div className={styles.messageContainer}>
         {errorMsg && <p className={styles.errorText}>{errorMsg}</p>}
       </div>
@@ -45,41 +45,41 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
         <Spinner />
       ) : (
         <div>
-          {properties.length > 0 && (
+          {!!buyers.length && (
             <>
               <div className={usersHeaderRow}>
-                <div className="username">Lot</div>
-                <div className="email">Name</div>
-                <div>Phase</div>
-                <div>Close of Escrow</div>
+                <div className="username">Name</div>
+                <div className="email">Email</div>
+                <div>Status</div>
+                <div>Invite Sent Date</div>
               </div>
 
-              {properties.map((property) => (
-                <div className={userRow} key={property.id}>
+              {buyers.map((buyer) => (
+                <div className={userRow} key={buyer.email}>
                   <div className="username cell">
-                    <div className="mobile-label">Lot:</div>
-                    <div className="value">{property.lot}</div>
+                    <div className="mobile-label">Name:</div>
+                    <div className="value">{`${buyer.firstName} ${buyer.lastName}`}</div>
                   </div>
                   <div className="email cell">
-                    <div className="mobile-label">Name:</div>
-                    <div className="value">{property.propertyName}</div>
+                    <div className="mobile-label">Email:</div>
+                    <div className="value">{buyer.email}</div>
                   </div>
                   <div className="cell">
-                    <div className="mobile-label">Phase:</div>
-                    <div className="value">{property.phase}</div>
+                    <div className="mobile-label">Status:</div>
+                    <div className="value">placeholder for status</div>
                   </div>
                   <div className="cell">
-                    <div className="mobile-label">Close of Escrow:</div>
+                    <div className="mobile-label">Invite Sent Date:</div>
                     <div className="value">
-                      {dateFormatter.format(new Date(property.closeOfEscrow || Date.now()))}
+                      {buyer.inviteSentData ? `${formatDate(buyer.inviteSentData)}` : 'Not Sent'}
                     </div>
                   </div>
                   <div className="manage cell">
-                    <a href="#manage" onClick={createManageFn(property)}>
+                    <a href="#manage" onClick={createManageFn(buyer)}>
                       Manage
                     </a>
                     &nbsp;|&nbsp;
-                    <a href="#delete" onClick={createDeleteUserFn(property)}>
+                    <a href="#delete" onClick={createDeleteBuyerFn(buyer)}>
                       Delete
                     </a>
                   </div>
@@ -93,15 +93,15 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
   );
 };
 
-ManageProperties.defaultProps = {
-  properties: [],
+BuyersView.defaultProps = {
+  buyers: [],
 };
 
-ManageProperties.propTypes = {
+BuyersView.propTypes = {
   deleteItem: func.isRequired,
-  properties: arrayOf(shape(propertyPropType)),
+  buyers: arrayOf(shape(buyerPropType)),
   setEditIsActive: func.isRequired,
   setSelectedItem: func.isRequired,
 };
 
-export default ManageProperties;
+export default BuyersView;
