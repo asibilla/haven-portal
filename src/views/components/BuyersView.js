@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 
 import { styles } from '../../constants';
 import { userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
-import { orgPropType } from '../../constants/propTypeObjects';
+import { buyerPropType } from '../../constants/propTypeObjects';
+
+import { formatDate } from '../../helpers';
 
 import OrgFilter from './OrgFilter';
 import Spinner from './Spinner';
@@ -53,14 +55,14 @@ const BuyersView = ({ deleteItem, buyers, setEditIsActive, setSelectedItem }) =>
               </div>
 
               {buyers.map((buyer) => (
-                <div className={userRow} key={buyer.EmailAddress}>
+                <div className={userRow} key={buyer.email}>
                   <div className="username cell">
                     <div className="mobile-label">Name:</div>
-                    <div className="value">{`${buyer.FirstName} ${buyer.LastName}`}</div>
+                    <div className="value">{`${buyer.firstName} ${buyer.lastName}`}</div>
                   </div>
                   <div className="email cell">
                     <div className="mobile-label">Email:</div>
-                    <div className="value">{buyer.EmailAddress}</div>
+                    <div className="value">{buyer.email}</div>
                   </div>
                   <div className="cell">
                     <div className="mobile-label">Status:</div>
@@ -69,7 +71,7 @@ const BuyersView = ({ deleteItem, buyers, setEditIsActive, setSelectedItem }) =>
                   <div className="cell">
                     <div className="mobile-label">Invite Sent Date:</div>
                     <div className="value">
-                      {buyer.InviteSentDate ? `${buyer.InviteSentDate}` : 'unknown'}
+                      {buyer.inviteSentData ? `${formatDate(buyer.inviteSentData)}` : 'Not Sent'}
                     </div>
                   </div>
                   <div className="manage cell">
@@ -97,7 +99,7 @@ BuyersView.defaultProps = {
 
 BuyersView.propTypes = {
   deleteItem: func.isRequired,
-  buyers: arrayOf(shape(orgPropType)),
+  buyers: arrayOf(shape(buyerPropType)),
   setEditIsActive: func.isRequired,
   setSelectedItem: func.isRequired,
 };

@@ -77,6 +77,7 @@ const OrgFilter = ({ selectedOrg, setErrorMsg, setLoading, setSelectedOrg, url }
 };
 
 OrgFilter.defaultProps = {
+  selectedOrg: '',
   url: '',
 };
 

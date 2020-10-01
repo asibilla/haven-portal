@@ -1,24 +1,21 @@
 import { isEmpty, noop } from 'lodash';
 import { func, shape } from 'prop-types';
 import React, { Fragment, useContext, useState } from 'react';
+import { v4 } from 'uuid';
 
 import { styles } from '../../constants';
-import { addNew } from '../../constants/styles/manageUsers';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import { buyerPropType } from '../../constants/propTypeObjects';
 
 import { addConsumer } from '../../helpers/ajax';
+import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import {
-  Button,
-  CheckboxInput,
-  DropdownMenu,
-  DropdownOption,
-  TextArea,
-  TextInput,
-} from '.';
+import { Button, CheckboxInput, DropdownMenu, DropdownOption, TextArea, TextInput } from '.';
+
+const lineBreakRegEx = /\r?\n|\r/;
+const textAreaToArray = (text) => text.split(lineBreakRegEx);
 
 const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMessage }) => {
   const [org, setOrg] = useState('');
@@ -94,36 +91,91 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       return;
     }
 
-    try {
-      const { idData: { jwtToken = '' } = {} } = authData;
-      /**
-       * TODO: add PropertyId
-       */
-      const requestBody = {
-        OrgId: org,
-        PropertyId: null,
-        Salutation: salutation,
-        FirstName: firstName,
-        LastName: lastName,
-        Suffix: suffix,
-        EmailAddress: email,
-        EmailOptIn: false,
-        SendInvite: sendInvite,
+    let id = selectedItem ? selectedItem.id : v4();
+
+    if (selectedItem) {
+      const queryItems = [
+        new DBQueryItem({ id: ':a', key: 'orgId', value: org }),
+        new DBQueryItem({ id: ':b', key: 'salutation', value: salutation }),
+        new DBQueryItem({ id: ':c', key: 'firstName', value: firstName }),
+        new DBQueryItem({ id: ':d', key: 'lastName', value: lastName }),
+        new DBQueryItem({ id: ':e', key: 'suffix', value: suffix }),
+        new DBQueryItem({ id: ':f', key: 'email', value: email }),
+        new DBQueryItem({ id: ':g', key: 'salesValue', value: salesValue }),
+        new DBQueryItem({ id: ':h', key: 'invoiceNumber', value: invoiceNumber }),
+        new DBQueryItem({ id: ':i', key: 'notes', value: textAreaToArray(notes) }),
+        new DBQueryItem({ id: ':j', key: 'actionedBy', value: actionedBy }),
+        new DBQueryItem({ id: ':k', key: 'demoConsumer', value: demoConsumer }),
+      ];
+
+      const keyItems = {
+        id,
       };
 
-      const { error } = await addConsumer({ authToken: jwtToken, body: requestBody });
-      if (error) {
-        throw error;
+      try {
+        await updateItem({ authData, items: queryItems, keyItems, tableName: 'buyers' });
+        updateSuccessMessage('Buyer successfully updated!');
+        await refreshData();
+        showEditView(false)();
+      } catch (err) {
+        setSubmitError(`An error occured: ${err.message}`);
+      }
+    } else {
+      // Add user to bridgeway's system.
+      try {
+        const { idData: { jwtToken = '' } = {} } = authData;
+        /**
+         * TODO: add PropertyId
+         */
+        const requestBody = {
+          OrgId: null,
+          PropertyId: null,
+          Salutation: salutation,
+          FirstName: firstName,
+          LastName: lastName,
+          Suffix: suffix,
+          EmailAddress: email,
+          EmailOptIn: false,
+          SendInvite: sendInvite,
+        };
+
+        const { data, error } = await addConsumer({ authToken: jwtToken, body: requestBody });
+        if (error) {
+          throw error;
+        }
+        id = data ? data.toString() : id;
+      } catch (err) {
+        setSubmitError(`Could not add user to bridgeway system: ${err.message}`);
+        setButtonIsDisabled(false);
+        return;
       }
 
-      refresh();
-      setButtonIsDisabled(false);
-      setSubmitSuccess('User successfully created!');
-      clearState();
-    } catch (err) {
-      setSubmitError(`Something went wrong: ${err}`);
-      setButtonIsDisabled(false);
+      const item = {
+        actionedBy,
+        demoConsumer,
+        email,
+        firstName,
+        id,
+        inviteSentData: sendInvite ? new Date().toString() : null,
+        invoiceNumber,
+        lastName,
+        orgId: org,
+        notes: textAreaToArray(notes),
+        salesValue,
+        salutation,
+        suffix,
+      };
+
+      try {
+        await putItem({ authData, item, tableName: 'buyers' });
+        setSubmitSuccess('Your buyer has been added!');
+        clearState();
+        refreshData();
+      } catch (err) {
+        setSubmitError(`An error occured: ${err.message}`);
+      }
     }
+    setButtonIsDisabled(false);
   };
 
   return (
@@ -218,7 +270,6 @@ AddBuyerForm.defaultProps = {
   selectedItem: null,
   showEditView: noop,
   updateSuccessMessage: noop,
-  url: '',
 };
 
 AddBuyerForm.propTypes = {

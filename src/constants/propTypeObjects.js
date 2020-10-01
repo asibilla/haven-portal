@@ -31,7 +31,7 @@ export const propertyPropType = {
 };
 
 export const buyerPropType = {
-  emailAddress: string.isRequired,
+  email: string.isRequired,
   firstName: string.isRequired,
   lastName: string.isRequired,
   orgId: string,
