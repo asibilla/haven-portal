@@ -1,6 +1,7 @@
 import { isEmpty, noop } from 'lodash';
-import { func, shape } from 'prop-types';
-import React, { Fragment, useContext, useState } from 'react';
+import { func, shape, string } from 'prop-types';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { css } from 'react-emotion';
 import { v4 } from 'uuid';
 
 import { styles } from '../../constants';
@@ -14,10 +15,13 @@ import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
 import { Button, CheckboxInput, DropdownMenu, DropdownOption, TextArea, TextInput } from '.';
 
+const sendInviteLink = css`
+  margin-top: 12px;
+`;
 const lineBreakRegEx = /\r?\n|\r/;
 const textAreaToArray = (text) => text.split(lineBreakRegEx);
 
-const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMessage }) => {
+const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMessage, url }) => {
   const [org, setOrg] = useState('');
   const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -38,6 +42,41 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
 
   const { authData, orgs } = useContext(AppContext);
 
+  const updateFormState = () => {
+    if (selectedItem) {
+      setOrg(selectedItem.orgId);
+      setSalutation(selectedItem.salutation);
+      setFirstName(selectedItem.firstName);
+      setLastName(selectedItem.lastName);
+      setSuffix(selectedItem.suffix);
+      setEmail(selectedItem.email);
+      setSalesValue(selectedItem.salesValue);
+      setInvoiceNumber(selectedItem.invoiceNumber);
+      setNotes(selectedItem.notes.join('\n'));
+      setActionedBy(selectedItem.actionedBy);
+      setDemoConsumer(selectedItem.demoConsumer);
+    }
+  };
+
+  const clearState = () => {
+    setOrg('');
+    setSalesValue('');
+    setFirstName('');
+    setLastName('');
+    setSuffix('');
+    setEmail('');
+    setSalesValue('');
+    setInvoiceNumber('');
+    setNotes('');
+    setActionedBy('');
+    setDemoConsumer(false);
+    setSendInvite(false);
+  };
+
+  useEffect(() => {
+    updateFormState();
+  }, [url]);
+
   const setValue = (setState) => {
     return (e) => {
       setState(e.target.value);
@@ -48,12 +87,6 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
     return (e) => {
       setState(e.target.checked);
     };
-  };
-
-  const clearState = () => {
-    setFirstName('');
-    setLastName('');
-    setEmail('');
   };
 
   const handleSubmit = async (e) => {
@@ -174,8 +207,8 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       } catch (err) {
         setSubmitError(`An error occured: ${err.message}`);
       }
+      setButtonIsDisabled(false);
     }
-    setButtonIsDisabled(false);
   };
 
   return (
@@ -232,13 +265,15 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
             onChange={setValue(setActionedBy)}
             value={actionedBy}
           />
-          <CheckboxInput
-            checked={sendInvite}
-            label="Send Invite?"
-            onChange={noop}
-            onClick={setCheckboxValue(setSendInvite)}
-            value="sendInvite"
-          />
+          {!selectedItem && (
+            <CheckboxInput
+              checked={sendInvite}
+              label="Send Invite?"
+              onChange={noop}
+              onClick={setCheckboxValue(setSendInvite)}
+              value="sendInvite"
+            />
+          )}
           <CheckboxInput
             checked={demoConsumer}
             label="Demo Consumer?"
@@ -246,6 +281,12 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
             onClick={setCheckboxValue(setDemoConsumer)}
             value="demoConsumer"
           />
+
+          {!!selectedItem && (
+            <div className={sendInviteLink}>
+              <a href="#/send-invite">Send Another Invite</a>
+            </div>
+          )}
 
           <div className={buttonContainer}>
             {selectedItem && (
@@ -270,6 +311,7 @@ AddBuyerForm.defaultProps = {
   selectedItem: null,
   showEditView: noop,
   updateSuccessMessage: noop,
+  url: '',
 };
 
 AddBuyerForm.propTypes = {
@@ -277,6 +319,7 @@ AddBuyerForm.propTypes = {
   selectedItem: shape(buyerPropType),
   showEditView: func,
   updateSuccessMessage: func,
+  url: string,
 };
 
 export default AddBuyerForm;
