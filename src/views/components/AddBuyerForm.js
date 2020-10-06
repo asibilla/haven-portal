@@ -14,6 +14,7 @@ import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
 import { Button, CheckboxInput, DropdownMenu, DropdownOption, TextArea, TextInput } from '.';
+import PropertyDropdown from './PropertyDropdown';
 
 const sendInviteLink = css`
   margin-top: 12px;
@@ -23,6 +24,7 @@ const textAreaToArray = (text) => text.split(lineBreakRegEx);
 
 const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMessage, url }) => {
   const [org, setOrg] = useState('');
+  const [propertyId, setProperty] = useState('');
   const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -45,6 +47,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
   const updateFormState = () => {
     if (selectedItem) {
       setOrg(selectedItem.orgId);
+      setProperty(selectedItem.propertyId);
       setSalutation(selectedItem.salutation);
       setFirstName(selectedItem.firstName);
       setLastName(selectedItem.lastName);
@@ -60,6 +63,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
 
   const clearState = () => {
     setOrg('');
+    setProperty('');
     setSalesValue('');
     setFirstName('');
     setLastName('');
@@ -139,6 +143,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         new DBQueryItem({ id: ':i', key: 'notes', value: textAreaToArray(notes) }),
         new DBQueryItem({ id: ':j', key: 'actionedBy', value: actionedBy }),
         new DBQueryItem({ id: ':k', key: 'demoConsumer', value: demoConsumer }),
+        new DBQueryItem({ id: ':l', key: 'propertyId', value: propertyId }),
       ];
 
       const keyItems = {
@@ -194,6 +199,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         lastName,
         orgId: org,
         notes: textAreaToArray(notes),
+        propertyId,
         salesValue,
         salutation,
         suffix,
@@ -225,6 +231,13 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
                 </Fragment>
               ))}
           </DropdownMenu>
+          <PropertyDropdown
+            selectedOrg={org}
+            selectedProperty={propertyId}
+            setErrorMsg={setSubmitError}
+            setLoading={buttonIsDisabled}
+            setSelectedProperty={setProperty}
+          />
           <TextInput labelText="Salutation" onChange={setValue(setSalutation)} value={salutation} />
           <TextInput
             error={validationErrors.firstName}
