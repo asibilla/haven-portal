@@ -23,8 +23,7 @@ const App = ({ url }) => {
         const auth = await isAuthenticated();
         updateAuthData(auth);
         setAuthVerified(true);
-      }
-      catch(err) {
+      } catch (err) {
         updateAuthData({});
       }
     })();
