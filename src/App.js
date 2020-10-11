@@ -19,9 +19,14 @@ const App = ({ url }) => {
 
   useEffect(() => {
     (async () => {
-      const auth = await isAuthenticated();
-      updateAuthData(auth);
-      setAuthVerified(true);
+      try {
+        const auth = await isAuthenticated();
+        updateAuthData(auth);
+        setAuthVerified(true);
+      }
+      catch(err) {
+        updateAuthData({});
+      }
     })();
   }, [url]);
 
