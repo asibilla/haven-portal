@@ -9,6 +9,7 @@ import { AdminHeader } from '../components';
 
 import ManageOrgs from './ManageOrgs';
 import ManageBuyers from './ManageBuyers';
+import ManageContractors from './ManageContractors';
 import ManageProperties from './ManageProperties';
 import AdminOverview from './AdminOverview';
 import ManageUser from './ManageUser';
@@ -39,6 +40,7 @@ const AdminHome = ({ url }) => {
           <Route path={`${match.path}${routes.manageOrgs}`} component={ManageOrgs} />
           <Route path={`${match.path}${routes.manageBuyers}`} component={ManageBuyers} />
           <Route path={`${match.path}${routes.manageProperties}`} component={ManageProperties} />
+          <Route path={`${match.path}${routes.manageContractors}`} component={ManageContractors} />
           <Route path={`${match.path}${routes.manageUser}`} component={ManageUser} />
           <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
         </Switch>
