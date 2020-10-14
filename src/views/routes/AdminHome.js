@@ -2,10 +2,10 @@ import { string } from 'prop-types';
 import React, { useContext, useEffect } from 'react';
 import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 
-import { routes, styles } from '../../constants';
+import { routes } from '../../constants';
 import { getJwt, isAdmin } from '../../helpers/auth';
 import AppContext from '../../helpers/context';
-import { AdminHeader } from '../components';
+import { AdminHeader, ContentWrapper, NavWrapper, PageWrapper } from '../components';
 
 import ManageOrgs from './ManageOrgs';
 import ManageBuyers from './ManageBuyers';
@@ -33,18 +33,25 @@ const AdminHome = ({ url }) => {
 
   return (
     <div className="admin-view">
-      <AdminHeader />
-      <div className={styles.contentSection}>
-        <Switch>
-          <Route exact path={match.path} component={AdminOverview} />
-          <Route path={`${match.path}${routes.manageOrgs}`} component={ManageOrgs} />
-          <Route path={`${match.path}${routes.manageBuyers}`} component={ManageBuyers} />
-          <Route path={`${match.path}${routes.manageProperties}`} component={ManageProperties} />
-          <Route path={`${match.path}${routes.manageContractors}`} component={ManageContractors} />
-          <Route path={`${match.path}${routes.manageUser}`} component={ManageUser} />
-          <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
-        </Switch>
-      </div>
+      <PageWrapper>
+        <NavWrapper>
+          <AdminHeader />
+        </NavWrapper>
+        <ContentWrapper>
+          <Switch>
+            <Route exact path={match.path} component={AdminOverview} />
+            <Route path={`${match.path}${routes.manageOrgs}`} component={ManageOrgs} />
+            <Route path={`${match.path}${routes.manageBuyers}`} component={ManageBuyers} />
+            <Route path={`${match.path}${routes.manageProperties}`} component={ManageProperties} />
+            <Route
+              path={`${match.path}${routes.manageContractors}`}
+              component={ManageContractors}
+            />
+            <Route path={`${match.path}${routes.manageUser}`} component={ManageUser} />
+            <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
+          </Switch>
+        </ContentWrapper>
+      </PageWrapper>
     </div>
   );
 };

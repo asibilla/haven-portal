@@ -77,8 +77,13 @@ export const buttonSecondary = css`
   }
 `;
 
-export const contentSection = css`
-  padding: 0 45px;
+export const contentWrapper = css`
+  flex-grow: 1;
+  padding: 24px 44px 0 0;
+
+  ${mobile} {
+    padding: 24px;
+  }
 `;
 
 export const errorText = css`
@@ -154,6 +159,14 @@ export const messageContainer = css`
 
 export const noPadding = css`
   padding: 0;
+`;
+
+export const pageWrapper = css`
+  ${desktop} {
+    ${flexRow}
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
 `;
 
 export const positonRelative = css`
