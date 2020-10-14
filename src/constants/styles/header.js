@@ -1,16 +1,18 @@
 import { css, cx } from 'react-emotion';
 
-import { black, flexRow, lightGrey, unstyledList } from './global';
+import { black, large, lightGrey, unstyledList } from './global';
 
 export const navItemsWrapper = cx(
   'nav-items',
   css`
-    flex-grow: 1;
+    padding-top: 36px;
+    text-align: left;
   `
 );
 
 export const navLink = css`
   color: ${black};
+  font-size: 16px;
   font-weight: 600;
   margin: 0 24px;
   text-decoration: none;
@@ -23,28 +25,38 @@ export const navLink = css`
   &:visited:not(.active) {
     color: ${black};
   }
+  ${large} {
+    font-size: 14px;
+  }
 `;
 
 export const navList = cx(
-  flexRow,
   unstyledList,
   css`
-    justify-content: flex-start;
-    height: 94px;
+    padding: 0 0 0 12px;
     li {
       cursor: pointer;
+      height: 30px;
+      line-height: 30px;
+
+      &.signout {
+        margin-top: 16px;
+      }
     }
   `
 );
 
 export const navWrapper = cx(
   'navigation',
-  flexRow,
   css`
-    padding: 15px 45px;
+    box-sizing: border-box;
+    padding: 16px 44px;
+    img {
+      max-width: 100%;
+    }
   `
 );
 
 export const siteHeader = css`
-  width: 100%;
+  width: 350px;
 `;
