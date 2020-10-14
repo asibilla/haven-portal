@@ -18,6 +18,9 @@ module.exports = {
   plugins: ['react', 'import', 'json', 'jest'],
   rules: {
     'import/prefer-default-export': 0,
+    'jsx-a11y/click-events-have-key-events': 0,
+    'jsx-a11y/no-static-element-interactions': 0,
+    'jsx-a11y/no-noninteractive-element-interactions': 0,
     'no-alert': 0,
     'react/button-has-type': 0,
     'react/jsx-filename-extension': 0,
