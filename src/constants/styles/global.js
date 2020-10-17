@@ -82,7 +82,7 @@ export const contentWrapper = css`
   padding: 24px 44px 0 0;
 
   ${mobile} {
-    padding: 24px;
+    padding: 102px 24px;
   }
 `;
 
