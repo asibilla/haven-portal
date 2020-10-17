@@ -42,20 +42,6 @@ class Tabset extends Component {
     this.refreshData();
   }
 
-  get editDeleteBlock() {
-    return (
-      <div>
-        <a href="#edit" onClick={this.showEditView(true)}>
-          Edit
-        </a>
-        <span> | </span>
-        <a href="#delete" onClick={this.deleteItem}>
-          Delete
-        </a>
-      </div>
-    );
-  }
-
   async setSelectedItem(item) {
     await this.setState({ selectedItem: item });
   }
@@ -74,7 +60,7 @@ class Tabset extends Component {
 
   async deleteItem() {
     const { authData } = this.context;
-    const { primaryKey, tableName } = this.props;
+    const { bridgewayDeleteFn, primaryKey, tableName } = this.props;
     const { selectedItem } = this.state;
     if (
       window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')
@@ -84,6 +70,12 @@ class Tabset extends Component {
       };
 
       try {
+        if (bridgewayDeleteFn) {
+          const { error } = await bridgewayDeleteFn({ authData, id: selectedItem.id });
+          if (error) {
+            throw new Error('Could not delete from Bridgeway system.');
+          }
+        }
         await deleteItem({ authData, item, tableName });
         this.setState({
           selectedItem: null,
@@ -182,7 +174,6 @@ class Tabset extends Component {
             <div className={styles.messageContainer}>
               {successMessage && <p className={styles.successText}>{successMessage}</p>}
             </div>
-            {selectedItem && !editIsActive && !addNewIsActive && this.editDeleteBlock}
             <WrappedComponent
               addNewIsActive={addNewIsActive}
               dataItems={dataItems}
@@ -202,7 +193,12 @@ class Tabset extends Component {
   }
 }
 
+Tabset.defaultProps = {
+  bridgewayDeleteFn: null,
+};
+
 Tabset.propTypes = {
+  bridgewayDeleteFn: func,
   primaryKey: string.isRequired,
   tableName: string.isRequired,
   WrappedComponent: func.isRequired,

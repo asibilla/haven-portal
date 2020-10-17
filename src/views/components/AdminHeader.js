@@ -13,11 +13,11 @@ const AdminHeader = () => {
           Overview
         </NavLink>
       </li>
-      <li>
+      {/* <li>
         <NavLink activeClassName="active" className={navLink} to={`${match.url}/manage-orgs`}>
           Orgs
         </NavLink>
-      </li>
+      </li> */}
       <li>
         <NavLink activeClassName="active" className={navLink} to={`${match.url}/manage-buyers`}>
           Buyers

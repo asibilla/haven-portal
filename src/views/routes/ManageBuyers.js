@@ -1,6 +1,8 @@
 import { arrayOf, bool, func, shape } from 'prop-types';
 import React from 'react';
 
+import { deleteConsumer } from '../../helpers/ajax';
+
 import AddBuyerForm from '../components/AddBuyerForm';
 import BuyersView from '../components/BuyersView';
 import { buyerPropType } from '../../constants/propTypeObjects';
@@ -62,6 +64,7 @@ ManageBuyersComponent.propTypes = {
 };
 
 export default withTabset({
+  bridgewayDeleteFn: deleteConsumer,
   primaryKey: 'id',
   tableName: 'buyers',
   WrappedComponent: ManageBuyersComponent,
