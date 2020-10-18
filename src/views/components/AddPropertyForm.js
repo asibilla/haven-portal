@@ -7,6 +7,7 @@ import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import { optionPropType } from '../../constants/propTypeObjects';
 
+import { addProperty } from '../../helpers/ajax';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
@@ -83,6 +84,30 @@ const AddPropertyForm = ({
         isRequiredString: true,
         value: org,
       }),
+      new ValidationItem({
+        displayName: 'Model',
+        fieldName: 'model',
+        isRequiredString: true,
+        value: model,
+      }),
+      new ValidationItem({
+        displayName: 'Tract',
+        fieldName: 'tract',
+        isRequiredString: true,
+        value: tract,
+      }),
+      new ValidationItem({
+        displayName: 'Phase',
+        fieldName: 'phase',
+        isRequiredString: true,
+        value: phase,
+      }),
+      new ValidationItem({
+        displayName: 'Close Of Escrow',
+        fieldName: 'closeOfEscrow',
+        isRequiredString: true,
+        value: closeOfEscrow,
+      }),
     ];
 
     const errors = validateItems({ items: validationObj });
@@ -93,11 +118,11 @@ const AddPropertyForm = ({
       return;
     }
 
-    const id = selectedItem ? selectedItem.id : v4();
+    let id = selectedItem ? selectedItem.id : v4();
 
     if (selectedItem) {
       const queryItems = [
-        new DBQueryItem({ id: ':a', key: 'org', value: org }),
+        new DBQueryItem({ id: ':a', key: 'org', value: 848 }),
         new DBQueryItem({ id: ':b', key: 'propertyName', value: propertyName }),
         new DBQueryItem({ id: ':d', key: 'model', value: model }),
         new DBQueryItem({ id: ':e', key: 'tract', value: tract }),
@@ -120,18 +145,35 @@ const AddPropertyForm = ({
         setButtonIsDisabled(false);
       }
     } else {
-      const item = {
-        id,
-        closeOfEscrow,
-        lot,
-        model,
-        org,
-        phase,
-        propertyName,
-        tract,
-      };
-
       try {
+        // Add to Bridgeway
+        const requestBody = {
+          CloseOfEscrow: closeOfEscrow,
+          Lot: lot,
+          Model: model,
+          Name: propertyName,
+          OrgId: 848,
+          Phase: phase,
+          Tract: tract,
+        };
+
+        const { data, error } = await addProperty({ authData, body: requestBody });
+        if (error) {
+          throw error;
+        }
+        id = data ? data.toString() : id;
+
+        const item = {
+          id,
+          closeOfEscrow,
+          lot,
+          model,
+          org: '848',
+          phase,
+          propertyName,
+          tract,
+        };
+
         await putItem({ authData, item, tableName: 'properties' });
         setSubmitSuccess('Your property has been added!');
         clearState();
@@ -143,38 +185,61 @@ const AddPropertyForm = ({
     }
   };
 
+  const selectedOrgName = selectedItem
+    ? (orgs.find((o) => o.id.toString() === selectedItem.org) || {}).orgName
+    : '';
+
   return (
     <div>
       <h3>{selectedItem ? 'Edit Property' : 'Add a New Property'}</h3>
       <form className={formContainer} onSubmit={handleSubmit}>
         <div className={formSection}>
-          <DropdownMenu
-            error={validationErrors.org}
-            id="org"
-            label="Org"
-            onChange={setValue(setOrg)}
-            value={org}
-          >
-            <DropdownOption text="" value="" />
-            {orgs &&
-              orgs.map((o) => (
-                <Fragment key={o.id}>
-                  <DropdownOption text={o.orgName} value={o.id} />
-                </Fragment>
-              ))}
-          </DropdownMenu>
+          {!selectedItem ? (
+            <DropdownMenu
+              error={validationErrors.org}
+              id="org"
+              label="Org"
+              onChange={setValue(setOrg)}
+              value={org}
+            >
+              <DropdownOption text="" value="" />
+              {orgs &&
+                orgs.map((o) => (
+                  <Fragment key={o.id}>
+                    <DropdownOption text={o.orgName} value={o.id} />
+                  </Fragment>
+                ))}
+            </DropdownMenu>
+          ) : (
+            <p>{`Org: ${selectedOrgName}`}</p>
+          )}
           <TextInput
             error={validationErrors.propertyName}
             labelText="Name"
             onChange={setValue(setName)}
             value={propertyName}
           />
-          <TextInput labelText="Model" onChange={setValue(setModel)} value={model} />
-          <TextInput labelText="Tract" onChange={setValue(setTract)} value={tract} />
+          <TextInput
+            error={validationErrors.model}
+            labelText="Model"
+            onChange={setValue(setModel)}
+            value={model}
+          />
+          <TextInput
+            error={validationErrors.tract}
+            labelText="Tract"
+            onChange={setValue(setTract)}
+            value={tract}
+          />
         </div>
 
         <div className={formSection}>
-          <TextInput labelText="Phase" onChange={setValue(setPhase)} value={phase} />
+          <TextInput
+            error={validationErrors.phase}
+            labelText="Phase"
+            onChange={setValue(setPhase)}
+            value={phase}
+          />
           <TextInput
             error={validationErrors.lot}
             labelText="Lot"
@@ -182,6 +247,7 @@ const AddPropertyForm = ({
             value={lot}
           />
           <TextInput
+            error={validationErrors.closeOfEscrow}
             labelText="Close of Escrow"
             onChange={setValue(setCloseOfEscrow)}
             value={closeOfEscrow}

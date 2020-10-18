@@ -2,8 +2,9 @@ import { func, string } from 'prop-types';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { css } from 'react-emotion';
 
+import { getOrgs } from '../../helpers/ajax';
 import AppContext from '../../helpers/context';
-import { scanDB } from '../../helpers/db';
+// import { scanDB } from '../../helpers/db';
 
 import { Button, DropdownMenu, DropdownOption } from '.';
 
@@ -17,11 +18,15 @@ const OrgFilter = ({ selectedOrg, setErrorMsg, setLoading, setSelectedOrg, url }
 
   const fetchOrgs = async () => {
     try {
-      const data = await scanDB({
-        authData,
-        tableName: 'orgs',
-      });
-      setOrgs(data.Items);
+      // const data = await scanDB({
+      //   authData,
+      //   tableName: 'orgs',
+      // });
+      const { data, error } = await getOrgs({ authData });
+      if (error || !data.Items) {
+        throw error || new Error('Could not get org data from Bridgeway.');
+      }
+      setOrgs(data.Items.map((item) => ({ id: item.OrgId, orgName: item.Name })));
     } catch (e) {
       setErrorMsg(`An error occured: ${e.message}`);
     }

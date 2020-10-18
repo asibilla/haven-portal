@@ -8,7 +8,7 @@ import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import { buyerPropType } from '../../constants/propTypeObjects';
 
-import { addConsumer } from '../../helpers/ajax';
+import { addConsumer, inviteAssignConsumer } from '../../helpers/ajax';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
@@ -93,6 +93,23 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
     };
   };
 
+  const sendNewInvite = async (e) => {
+    /**
+     * TODO: update invite sent date.
+     */
+    e.preventDefault();
+    setSubmitError(null);
+    setSubmitSuccess('Sending Invite ...');
+    const { error } = await inviteAssignConsumer({ authData, id: selectedItem.id });
+    if (error) {
+      setSubmitSuccess('');
+      setSubmitError(`Could not re-send invite. Please try again. ${error.message}`);
+    } else {
+      setSubmitError(null);
+      setSubmitSuccess('Invite sent!');
+    }
+  };
+
   const handleSubmit = async (e) => {
     setButtonIsDisabled(true);
     setValidationErrors({});
@@ -100,6 +117,12 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
     e.preventDefault();
 
     const validationObj = [
+      new ValidationItem({
+        displayName: 'org',
+        fieldName: 'org',
+        isRequiredString: true,
+        value: org,
+      }),
       new ValidationItem({
         displayName: 'First Name',
         fieldName: 'firstName',
@@ -151,6 +174,12 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       };
 
       try {
+        if (propertyId && !selectedItem.propertyId) {
+          const { error } = await inviteAssignConsumer({ authData, id, propertyId });
+          if (error) {
+            throw error;
+          }
+        }
         await updateItem({ authData, items: queryItems, keyItems, tableName: 'buyers' });
         updateSuccessMessage('Buyer successfully updated!');
         await refreshData();
@@ -162,12 +191,9 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       // Add user to bridgeway's system.
       try {
         const { idData: { jwtToken = '' } = {} } = authData;
-        /**
-         * TODO: add PropertyId
-         */
         const requestBody = {
-          OrgId: null,
-          PropertyId: null,
+          OrgId: org,
+          PropertyId: propertyId || null,
           Salutation: salutation,
           FirstName: firstName,
           LastName: lastName,
@@ -217,25 +243,40 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
     }
   };
 
+  const selectedOrgName = selectedItem
+    ? (orgs.find((o) => o.id.toString() === selectedItem.orgId) || {}).orgName
+    : '';
+
   return (
     <div>
       <h3>Add New Buyer</h3>
       <form className={formContainer} onSubmit={handleSubmit}>
         <div className={formSection}>
-          <DropdownMenu id="org" label="Org" onChange={setValue(setOrg)} value={org}>
-            <DropdownOption text="" value="" />
-            {orgs &&
-              orgs.map((o) => (
-                <Fragment key={o.id}>
-                  <DropdownOption text={o.orgName} value={o.id} />
-                </Fragment>
-              ))}
-          </DropdownMenu>
+          {!selectedItem ? (
+            <DropdownMenu
+              error={validationErrors.org}
+              id="org"
+              label="Org"
+              onChange={setValue(setOrg)}
+              value={org}
+            >
+              <DropdownOption text="" value="" />
+              {orgs &&
+                orgs.map((o) => (
+                  <Fragment key={o.id}>
+                    <DropdownOption text={o.orgName} value={o.id} />
+                  </Fragment>
+                ))}
+            </DropdownMenu>
+          ) : (
+            <p>{`Org: ${selectedOrgName}`}</p>
+          )}
+
           <PropertyDropdown
             selectedOrg={org}
             selectedProperty={propertyId}
             setErrorMsg={setSubmitError}
-            setLoading={buttonIsDisabled}
+            setLoading={setButtonIsDisabled}
             setSelectedProperty={setProperty}
           />
           <TextInput labelText="Salutation" onChange={setValue(setSalutation)} value={salutation} />
@@ -297,7 +338,9 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
 
           {!!selectedItem && (
             <div className={sendInviteLink}>
-              <a href="#/send-invite">Send Another Invite</a>
+              <a href="#/send-invite" onClick={sendNewInvite} disabled>
+                Send Another Invite
+              </a>
             </div>
           )}
 
