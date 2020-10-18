@@ -8,12 +8,21 @@ import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import { buyerPropType } from '../../constants/propTypeObjects';
 
+import { formatDate } from '../../helpers';
 import { addConsumer, inviteAssignConsumer } from '../../helpers/ajax';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import AppContext from '../../helpers/context';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import { Button, CheckboxInput, DropdownMenu, DropdownOption, TextArea, TextInput } from '.';
+import {
+  Button,
+  CheckboxInput,
+  DateSelect,
+  DropdownMenu,
+  DropdownOption,
+  TextArea,
+  TextInput,
+} from '.';
 import PropertyDropdown from './PropertyDropdown';
 
 const sendInviteLink = css`
@@ -36,6 +45,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
   const [actionedBy, setActionedBy] = useState('');
   const [sendInvite, setSendInvite] = useState(false);
   const [demoConsumer, setDemoConsumer] = useState(false);
+  const [spinDate, setSpinDate] = useState(null);
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -58,6 +68,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       setNotes(selectedItem.notes.join('\n'));
       setActionedBy(selectedItem.actionedBy);
       setDemoConsumer(selectedItem.demoConsumer);
+      setSpinDate(selectedItem.spinDate);
     }
   };
 
@@ -91,6 +102,12 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
     return (e) => {
       setState(e.target.checked);
     };
+  };
+
+  const setDateValue = (e) => {
+    if (e) {
+      setSpinDate(formatDate(e));
+    }
   };
 
   const sendNewInvite = async (e) => {
@@ -167,6 +184,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         new DBQueryItem({ id: ':j', key: 'actionedBy', value: actionedBy }),
         new DBQueryItem({ id: ':k', key: 'demoConsumer', value: demoConsumer }),
         new DBQueryItem({ id: ':l', key: 'propertyId', value: propertyId }),
+        new DBQueryItem({ id: ':m', key: 'spinDate', value: spinDate }),
       ];
 
       const keyItems = {
@@ -174,7 +192,11 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       };
 
       try {
-        if (propertyId && !selectedItem.propertyId) {
+        if (spinDate && !propertyId) {
+          throw Error('A property must be assigned to assign a spin date');
+        }
+
+        if (propertyId && propertyId !== selectedItem.propertyId) {
           const { error } = await inviteAssignConsumer({ authData, id, propertyId });
           if (error) {
             throw error;
@@ -228,6 +250,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         propertyId,
         salesValue,
         salutation,
+        spinDate,
         suffix,
       };
 
@@ -246,6 +269,8 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
   const selectedOrgName = selectedItem
     ? (orgs.find((o) => o.id.toString() === selectedItem.orgId) || {}).orgName
     : '';
+
+  const spinDateDisplayValue = spinDate || new Date().toString();
 
   return (
     <div>
@@ -337,18 +362,26 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
           />
 
           {!!selectedItem && (
-            <div className={sendInviteLink}>
-              <a href="#/send-invite" onClick={sendNewInvite} disabled>
-                Send Another Invite
-              </a>
-            </div>
+            <>
+              <div className={sendInviteLink}>
+                <DateSelect
+                  labelText="Property Spin Date"
+                  onChange={setDateValue}
+                  startDate={spinDateDisplayValue}
+                />
+              </div>
+              <div className={sendInviteLink}>
+                <a href="#/send-invite" onClick={sendNewInvite} disabled>
+                  Send Another Invite
+                </a>
+              </div>
+            </>
           )}
 
           <div className={buttonContainer}>
             {selectedItem && (
               <Button
                 className={styles.buttonSecondary}
-                disabled={buttonIsDisabled}
                 onClick={showEditView(false)}
                 text="Cancel"
               />

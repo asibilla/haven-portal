@@ -7,12 +7,13 @@ import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 import { optionPropType } from '../../constants/propTypeObjects';
 
+import formatDate from '../../helpers/dateFormatter';
 import { addProperty } from '../../helpers/ajax';
 import AppContext from '../../helpers/context';
 import { DBQueryItem, putItem, updateItem } from '../../helpers/db';
 import { ValidationItem, validateItems } from '../../helpers/formValidation';
 
-import { Button, DropdownMenu, DropdownOption, TextInput } from '.';
+import { Button, DateSelect, DropdownMenu, DropdownOption, TextInput } from '.';
 
 const AddPropertyForm = ({
   refreshData,
@@ -27,7 +28,7 @@ const AddPropertyForm = ({
   const [tract, setTract] = useState('');
   const [phase, setPhase] = useState('');
   const [lot, setLot] = useState('');
-  const [closeOfEscrow, setCloseOfEscrow] = useState('');
+  const [closeOfEscrow, setCloseOfEscrow] = useState(new Date().toString());
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -58,6 +59,12 @@ const AddPropertyForm = ({
     setOrg('');
     setName('');
     setModel('');
+  };
+
+  const setDateValue = (e) => {
+    if (e) {
+      setCloseOfEscrow(formatDate(e));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -122,7 +129,7 @@ const AddPropertyForm = ({
 
     if (selectedItem) {
       const queryItems = [
-        new DBQueryItem({ id: ':a', key: 'org', value: 848 }),
+        new DBQueryItem({ id: ':a', key: 'org', value: org }),
         new DBQueryItem({ id: ':b', key: 'propertyName', value: propertyName }),
         new DBQueryItem({ id: ':d', key: 'model', value: model }),
         new DBQueryItem({ id: ':e', key: 'tract', value: tract }),
@@ -152,7 +159,7 @@ const AddPropertyForm = ({
           Lot: lot,
           Model: model,
           Name: propertyName,
-          OrgId: 848,
+          OrgId: org,
           Phase: phase,
           Tract: tract,
         };
@@ -168,7 +175,7 @@ const AddPropertyForm = ({
           closeOfEscrow,
           lot,
           model,
-          org: '848',
+          org,
           phase,
           propertyName,
           tract,
@@ -246,11 +253,11 @@ const AddPropertyForm = ({
             onChange={setValue(setLot)}
             value={lot}
           />
-          <TextInput
+          <DateSelect
             error={validationErrors.closeOfEscrow}
             labelText="Close of Escrow"
-            onChange={setValue(setCloseOfEscrow)}
-            value={closeOfEscrow}
+            onChange={setDateValue}
+            startDate={closeOfEscrow}
           />
 
           <div className={buttonContainer}>
