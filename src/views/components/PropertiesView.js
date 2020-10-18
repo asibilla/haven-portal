@@ -5,6 +5,8 @@ import { styles } from '../../constants';
 import { userRow, usersHeaderRow } from '../../constants/styles/manageUsers';
 import { propertyPropType } from '../../constants/propTypeObjects';
 
+import { formatDate } from '../../helpers';
+
 import OrgFilter from './OrgFilter';
 import Spinner from './Spinner';
 
@@ -12,8 +14,6 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOrg, setSelectedOrg] = useState('');
-
-  const dateFormatter = new Intl.DateTimeFormat('en-US');
 
   const createManageFn = (property) => () => {
     setSelectedItem(property);
@@ -71,7 +71,7 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
                   <div className="cell">
                     <div className="mobile-label">Close of Escrow:</div>
                     <div className="value">
-                      {dateFormatter.format(new Date(property.closeOfEscrow || Date.now()))}
+                      {formatDate(new Date(property.closeOfEscrow || Date.now()))}
                     </div>
                   </div>
                   <div className="manage cell">
