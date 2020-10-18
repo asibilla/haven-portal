@@ -38,6 +38,11 @@ const AdminHeader = () => {
         </NavLink>
       </li>
       <li>
+        <NavLink activeClassName="active" className={navLink} to={`${match.url}/scheduler`}>
+          Scheduler
+        </NavLink>
+      </li>
+      <li>
         <NavLink activeClassName="active" className={navLink} to={`${match.url}/manage-users`}>
           Portal Users
         </NavLink>

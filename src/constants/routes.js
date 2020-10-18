@@ -11,6 +11,7 @@ const routes = {
   manageUser: '/manage-user/:id',
   manageUsers: '/manage-users',
   resetPassword: '/reset-password',
+  scheduler: '/scheduler',
   userHome: '/welcome',
   userSignIn: '/',
 };
