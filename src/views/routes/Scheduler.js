@@ -1,35 +1,28 @@
 import { string } from 'prop-types';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { css } from 'react-emotion';
-// import { DatePicker } from 'react-rainbow-components';
 
 import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
-import formatDate from '../../helpers/dateFormatter';
-// import formatDate, {
-//   calculateMaxDate,
-//   cutoff2Range,
-//   cutoff3Range,
-//   fortyFourDays,
-// } from '../../helpers/dateFormatter';
+
+import formatDate, {
+  calculateMaxDate,
+  cutoff1Range,
+  cutoff2Range,
+  cutoff3Range,
+} from '../../helpers/dateFormatter';
 import AppContext from '../../helpers/context';
 import { scanDB } from '../../helpers/db';
 
-import { Button, DropdownMenu, DropdownOption } from '../components';
+import { Button, DateSelect, DropdownMenu, DropdownOption } from '../components';
 
 const pageWrapper = css`
   margin: 44px 0;
 `;
 
-// const datePickerWrapper = css`
-//   margin-bottom: 44px;
-
-//   & label {
-//     align-self: flex-start;
-//     font-weight: 600;
-//     margin-left: 8px;
-//   }
-// `;
+const datePickerWrapper = css`
+  margin-bottom: 44px;
+`;
 
 const Scheduler = ({ url }) => {
   const { authData } = useContext(AppContext);
@@ -38,9 +31,9 @@ const Scheduler = ({ url }) => {
   const [selectedBuyerId, setSelectedBuyerId] = useState('');
   const [properties, setProperties] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  // const [cutoff1, setCutoff1] = useState('');
-  // const [cutoff2, setCutoff2] = useState('');
-  // const [cutoff3, setCutoff3] = useState('');
+  const [cutoff1, setCutoff1] = useState('');
+  const [cutoff2, setCutoff2] = useState('');
+  const [cutoff3, setCutoff3] = useState('');
 
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState('');
@@ -86,11 +79,9 @@ const Scheduler = ({ url }) => {
     setSubmitSuccess('Under Construction');
   };
 
-  // const createDatepickerOnChange = (setState) => (e) => {
-  //   setState(formatDate(e));
-  // };
-
-  // const toDate = (dateString) => new Date(dateString);
+  const createDatepickerOnChange = (setState) => (e) => {
+    setState(formatDate(e));
+  };
 
   return (
     <div className={pageWrapper}>
@@ -135,38 +126,38 @@ const Scheduler = ({ url }) => {
               <p>A Spin Date has not been assigned. Please assign a date in the buyers section.</p>
             ) : (
               <div>
-                {/* <DatePicker
+                <DateSelect
                   className={datePickerWrapper}
-                  label="Cutoff 1"
+                  labelText="Cutoff 1"
                   maxDate={calculateMaxDate({
-                    days: fortyFourDays,
+                    days: cutoff1Range,
                     spinDate: selectedBuyer.spinDate,
                   })}
-                  minDate={toDate(selectedBuyer.spinDate)}
+                  minDate={selectedBuyer.spinDate}
                   onChange={createDatepickerOnChange(setCutoff1)}
                   placeholder="Schedule a date for first cutoff"
-                  value={cutoff1 ? toDate(cutoff1) : ''}
+                  startDate={cutoff1}
                 />
-                <DatePicker
+                <DateSelect
                   className={datePickerWrapper}
                   disabled={!cutoff1}
-                  label="Cutoff 2"
+                  labelText="Cutoff 2"
                   maxDate={calculateMaxDate({ days: cutoff2Range, spinDate: cutoff1 })}
-                  minDate={toDate(cutoff1)}
-                  onChange={createDatepickerOnChange(setCutoff2)}
+                  minDate={cutoff1}
+                  onChange={setCutoff2}
                   placeholder="Schedule a date for second cutoff"
-                  value={cutoff2 ? toDate(cutoff2) : ''}
+                  startDate={cutoff2}
                 />
-                <DatePicker
+                <DateSelect
                   className={datePickerWrapper}
                   disabled={!cutoff1 || !cutoff2}
-                  label="Cutoff 3"
+                  labelText="Cutoff 3"
                   maxDate={calculateMaxDate({ days: cutoff3Range, spinDate: cutoff2 })}
-                  minDate={toDate(cutoff2)}
+                  minDate={cutoff2}
                   onChange={createDatepickerOnChange(setCutoff3)}
                   placeholder="Schedule a date for final cutoff"
-                  value={cutoff3 ? toDate(cutoff3) : ''}
-                /> */}
+                  startDate={cutoff3}
+                />
                 <div className={buttonContainer}>
                   <Button disabled={buttonIsDisabled} text="Submit" type="submit" />
                 </div>
