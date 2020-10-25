@@ -53,7 +53,7 @@ const PropertyDropdown = ({
 
   return (
     <div>
-      {properties.length && (
+      {properties.length > 0 && (
         <>
           <DropdownMenu
             id="property"

@@ -5,12 +5,7 @@ import { css } from 'react-emotion';
 import { styles } from '../../constants';
 import { buttonContainer, formContainer, formSection } from '../../constants/styles/manageOptions';
 
-import formatDate, {
-  calculateMaxDate,
-  cutoff1Range,
-  cutoff2Range,
-  cutoff3Range,
-} from '../../helpers/dateFormatter';
+import formatDate, { daysInMs, calculateMaxDate } from '../../helpers/dateFormatter';
 import AppContext from '../../helpers/context';
 import { scanDB } from '../../helpers/db';
 
@@ -83,6 +78,15 @@ const Scheduler = ({ url }) => {
     setState(formatDate(e));
   };
 
+  const getCuttoffMax = (days) => {
+    return formatDate(
+      calculateMaxDate({
+        days: daysInMs(days),
+        startDate: selectedProperty.houseStartDate,
+      })
+    );
+  };
+
   return (
     <div className={pageWrapper}>
       <h3>Scheduler</h3>
@@ -110,30 +114,52 @@ const Scheduler = ({ url }) => {
         <form className={formContainer} onSubmit={handleSubmit}>
           <div className={formSection}>
             {selectedProperty && (
-              <div>
-                <p className="bold">Property Info</p>
-                <p>{`Name: ${selectedProperty.propertyName}`}</p>
-                <p>{`Lot: ${selectedProperty.lot}`}</p>
-                <p>{`Model: ${selectedProperty.model}`}</p>
-                <p>{`Phase: ${selectedProperty.phase}`}</p>
-                <p>{`Tract: ${selectedProperty.tract}`}</p>
-                <p>{`Close of Escrow: ${formatDate(selectedProperty.closeOfEscrow)}`}</p>
-              </div>
+              <>
+                <div className="mb">
+                  <p className="bold">Scheduling Info</p>
+                  <p>{`House Start Date: ${selectedProperty.houseStartDate}`}</p>
+                  <p>
+                    {`Spin Date: ${formatDate(
+                      calculateMaxDate({
+                        days: daysInMs(1),
+                        startDate: selectedProperty.houseStartDate,
+                      })
+                    )}`}
+                  </p>
+                  <p>
+                    {`Pour Foundation: ${formatDate(
+                      calculateMaxDate({
+                        days: daysInMs(23),
+                        startDate: selectedProperty.houseStartDate,
+                      })
+                    )}`}
+                  </p>
+                </div>
+                <div>
+                  <p className="bold">Property Info</p>
+                  <p>{`Name: ${selectedProperty.propertyName}`}</p>
+                  <p>{`Lot: ${selectedProperty.lot}`}</p>
+                  <p>{`Model: ${selectedProperty.model}`}</p>
+                  <p>{`Phase: ${selectedProperty.phase}`}</p>
+                  <p>{`Tract: ${selectedProperty.tract}`}</p>
+                  <p>{`Close of Escrow: ${formatDate(selectedProperty.closeOfEscrow)}`}</p>
+                </div>
+              </>
             )}
           </div>
           <div className={formSection}>
-            {!selectedBuyer.spinDate ? (
-              <p>A Spin Date has not been assigned. Please assign a date in the buyers section.</p>
+            {!selectedProperty.houseStartDate ? (
+              <p>
+                A House Start Date has not been assigned to this property. Please assign a date in
+                the Properties section.
+              </p>
             ) : (
               <div>
                 <DateSelect
                   className={datePickerWrapper}
-                  labelText="Cutoff 1"
-                  maxDate={calculateMaxDate({
-                    days: cutoff1Range,
-                    spinDate: selectedBuyer.spinDate,
-                  })}
-                  minDate={selectedBuyer.spinDate}
+                  labelText={`Cutoff 1 (${getCuttoffMax(44)}):`}
+                  maxDate={getCuttoffMax(44)}
+                  minDate={selectedProperty.houseStartDate}
                   onChange={createDatepickerOnChange(setCutoff1)}
                   placeholder="Schedule a date for first cutoff"
                   startDate={cutoff1}
@@ -141,18 +167,18 @@ const Scheduler = ({ url }) => {
                 <DateSelect
                   className={datePickerWrapper}
                   disabled={!cutoff1}
-                  labelText="Cutoff 2"
-                  maxDate={calculateMaxDate({ days: cutoff2Range, spinDate: cutoff1 })}
+                  labelText={`Cutoff 2 (${getCuttoffMax(95)}):`}
+                  maxDate={getCuttoffMax(95)}
                   minDate={cutoff1}
-                  onChange={setCutoff2}
+                  onChange={createDatepickerOnChange(setCutoff2)}
                   placeholder="Schedule a date for second cutoff"
                   startDate={cutoff2}
                 />
                 <DateSelect
                   className={datePickerWrapper}
                   disabled={!cutoff1 || !cutoff2}
-                  labelText="Cutoff 3"
-                  maxDate={calculateMaxDate({ days: cutoff3Range, spinDate: cutoff2 })}
+                  labelText={`Cutoff 3 (${getCuttoffMax(187)})`}
+                  maxDate={getCuttoffMax(187)}
                   minDate={cutoff2}
                   onChange={createDatepickerOnChange(setCutoff3)}
                   placeholder="Schedule a date for final cutoff"
