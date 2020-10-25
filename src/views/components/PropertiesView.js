@@ -50,7 +50,7 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
               <div className={usersHeaderRow}>
                 <div className="username">Lot</div>
                 <div className="email">Name</div>
-                <div>Phase</div>
+                <div>House Start Date</div>
                 <div>Close of Escrow</div>
               </div>
 
@@ -65,8 +65,10 @@ const ManageProperties = ({ deleteItem, properties, setEditIsActive, setSelected
                     <div className="value">{property.propertyName}</div>
                   </div>
                   <div className="cell">
-                    <div className="mobile-label">Phase:</div>
-                    <div className="value">{property.phase}</div>
+                    <div className="mobile-label">House Start Date:</div>
+                    <div className="value">
+                      {property.houseStartDate ? <>{property.houseStartDate}</> : <>Not Set</>}
+                    </div>
                   </div>
                   <div className="cell">
                     <div className="mobile-label">Close of Escrow:</div>

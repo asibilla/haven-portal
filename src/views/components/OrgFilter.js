@@ -56,7 +56,7 @@ const OrgFilter = ({ selectedOrg, setErrorMsg, setLoading, setSelectedOrg, url }
 
   return (
     <div>
-      {orgs.length && (
+      {orgs.length > 0 && (
         <>
           <DropdownMenu id="org" label="Filter By Org" onChange={selectOrg} value={selectedOrg}>
             <DropdownOption text="" value="" />

@@ -45,7 +45,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
   const [actionedBy, setActionedBy] = useState('');
   const [sendInvite, setSendInvite] = useState(false);
   const [demoConsumer, setDemoConsumer] = useState(false);
-  const [spinDate, setSpinDate] = useState(null);
+  const [entryDate, setEntryDate] = useState('');
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -68,7 +68,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       setNotes(selectedItem.notes.join('\n'));
       setActionedBy(selectedItem.actionedBy);
       setDemoConsumer(selectedItem.demoConsumer);
-      setSpinDate(selectedItem.spinDate);
+      setEntryDate(selectedItem.entryDate || '');
     }
   };
 
@@ -106,7 +106,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
 
   const setDateValue = (e) => {
     if (e) {
-      setSpinDate(formatDate(e));
+      setEntryDate(formatDate(e));
     }
   };
 
@@ -184,7 +184,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         new DBQueryItem({ id: ':j', key: 'actionedBy', value: actionedBy }),
         new DBQueryItem({ id: ':k', key: 'demoConsumer', value: demoConsumer }),
         new DBQueryItem({ id: ':l', key: 'propertyId', value: propertyId }),
-        new DBQueryItem({ id: ':m', key: 'spinDate', value: spinDate }),
+        new DBQueryItem({ id: ':m', key: 'entryDate', value: entryDate }),
       ];
 
       const keyItems = {
@@ -192,7 +192,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
       };
 
       try {
-        if (spinDate && !propertyId) {
+        if (entryDate && !propertyId) {
           throw Error('A property must be assigned to assign a spin date');
         }
 
@@ -250,7 +250,7 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
         propertyId,
         salesValue,
         salutation,
-        spinDate,
+        entryDate,
         suffix,
       };
 
@@ -269,8 +269,6 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
   const selectedOrgName = selectedItem
     ? (orgs.find((o) => o.id.toString() === selectedItem.orgId) || {}).orgName
     : '';
-
-  const spinDateDisplayValue = spinDate || new Date().toString();
 
   return (
     <div>
@@ -365,14 +363,14 @@ const AddBuyerForm = ({ refreshData, selectedItem, showEditView, updateSuccessMe
             <>
               <div className={sendInviteLink}>
                 <DateSelect
-                  labelText="Property Spin Date"
+                  labelText="Buyer Entry Date"
                   onChange={setDateValue}
-                  startDate={spinDateDisplayValue}
+                  startDate={entryDate}
                 />
               </div>
               <div className={sendInviteLink}>
                 <a href="#/send-invite" onClick={sendNewInvite} disabled>
-                  Send Another Invite
+                  Send Invite
                 </a>
               </div>
             </>

@@ -28,7 +28,8 @@ const AddPropertyForm = ({
   const [tract, setTract] = useState('');
   const [phase, setPhase] = useState('');
   const [lot, setLot] = useState('');
-  const [closeOfEscrow, setCloseOfEscrow] = useState(new Date().toString());
+  const [closeOfEscrow, setCloseOfEscrow] = useState('');
+  const [houseStartDate, setHouseStartDate] = useState('');
 
   const [buttonIsDisabled, setButtonIsDisabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -46,6 +47,7 @@ const AddPropertyForm = ({
       setPhase(selectedItem.phase);
       setLot(selectedItem.lot);
       setCloseOfEscrow(selectedItem.closeOfEscrow);
+      setHouseStartDate(selectedItem.houseStartDate || '');
     }
   }, [url]);
 
@@ -59,17 +61,23 @@ const AddPropertyForm = ({
     setOrg('');
     setName('');
     setModel('');
+    setTract('');
+    setPhase('');
+    setLot('');
+    setCloseOfEscrow('');
+    setHouseStartDate('');
   };
 
-  const setDateValue = (e) => {
+  const setDateValue = (setState) => (e) => {
     if (e) {
-      setCloseOfEscrow(formatDate(e));
+      setState(formatDate(e));
     }
   };
 
   const handleSubmit = async (e) => {
     setButtonIsDisabled(true);
     setValidationErrors({});
+    setSubmitError(null);
     e.preventDefault();
 
     const validationObj = [
@@ -131,11 +139,12 @@ const AddPropertyForm = ({
       const queryItems = [
         new DBQueryItem({ id: ':a', key: 'org', value: org }),
         new DBQueryItem({ id: ':b', key: 'propertyName', value: propertyName }),
-        new DBQueryItem({ id: ':d', key: 'model', value: model }),
-        new DBQueryItem({ id: ':e', key: 'tract', value: tract }),
-        new DBQueryItem({ id: ':f', key: 'phase', value: phase }),
-        new DBQueryItem({ id: ':g', key: 'lot', value: lot }),
-        new DBQueryItem({ id: ':j', key: 'closeOfEscrow', value: closeOfEscrow }),
+        new DBQueryItem({ id: ':c', key: 'model', value: model }),
+        new DBQueryItem({ id: ':d', key: 'tract', value: tract }),
+        new DBQueryItem({ id: ':e', key: 'phase', value: phase }),
+        new DBQueryItem({ id: ':f', key: 'lot', value: lot }),
+        new DBQueryItem({ id: ':g', key: 'closeOfEscrow', value: closeOfEscrow }),
+        new DBQueryItem({ id: ':h', key: 'houseStartDate', value: houseStartDate }),
       ];
 
       const keyItems = {
@@ -173,6 +182,7 @@ const AddPropertyForm = ({
         const item = {
           id,
           closeOfEscrow,
+          houseStartDate,
           lot,
           model,
           org,
@@ -256,8 +266,13 @@ const AddPropertyForm = ({
           <DateSelect
             error={validationErrors.closeOfEscrow}
             labelText="Close of Escrow"
-            onChange={setDateValue}
+            onChange={setDateValue(setCloseOfEscrow)}
             startDate={closeOfEscrow}
+          />
+          <DateSelect
+            labelText="House Start Date"
+            onChange={setDateValue(setHouseStartDate)}
+            startDate={houseStartDate}
           />
 
           <div className={buttonContainer}>
