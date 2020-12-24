@@ -14,6 +14,7 @@ import ManageProperties from './ManageProperties';
 import AdminOverview from './AdminOverview';
 import ManageUser from './ManageUser';
 import ManageUsers from './ManageUsers';
+import ManageOptions from './ManageOptions';
 import Scheduler from './Scheduler';
 
 const AdminHome = ({ url }) => {
@@ -44,6 +45,7 @@ const AdminHome = ({ url }) => {
             <Route path={`${match.path}${routes.manageOrgs}`} component={ManageOrgs} />
             <Route path={`${match.path}${routes.manageBuyers}`} component={ManageBuyers} />
             <Route path={`${match.path}${routes.manageProperties}`} component={ManageProperties} />
+            <Route path={`${match.path}${routes.manageOptions}`} component={ManageOptions} />
             <Route path={`${match.path}${routes.scheduler}`} component={Scheduler} />
             <Route
               path={`${match.path}${routes.manageContractors}`}

@@ -29,6 +29,11 @@ const AdminHeader = () => {
         </NavLink>
       </li>
       <li>
+        <NavLink activeClassName="active" className={navLink} to={`${match.url}/manage-options`}>
+          Options
+        </NavLink>
+      </li>
+      <li>
         <NavLink
           activeClassName="active"
           className={navLink}
