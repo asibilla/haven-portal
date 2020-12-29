@@ -1,6 +1,7 @@
 import { find } from 'lodash';
 import { arrayOf, bool, func, shape } from 'prop-types';
 import React, { Fragment } from 'react';
+import { css } from 'react-emotion';
 
 import { DropdownMenu, DropdownOption } from '../components';
 import OptionsForm from '../components/OptionsForm';
@@ -11,6 +12,7 @@ import withTabset from '../hocs/withTabset';
 const ManageOptionsComponent = ({
   addNewIsActive,
   dataItems,
+  deleteItem,
   editIsActive,
   refreshData,
   setEditIsActive,
@@ -26,7 +28,7 @@ const ManageOptionsComponent = ({
 
   return (
     <div>
-      {!editIsActive && (
+      {!editIsActive && !addNewIsActive && (
         <DropdownMenu
           id="option"
           label="Select an Option"
@@ -42,12 +44,23 @@ const ManageOptionsComponent = ({
             ))}
         </DropdownMenu>
       )}
-      {selectedItem && !editIsActive && (
-        <div>
-          <a href="#edit" onClick={() => setEditIsActive(true)}>
-            Edit Option
-          </a>
-        </div>
+      {selectedItem && !editIsActive && !addNewIsActive && (
+        <>
+          <div
+            className={css`
+              margin-bottom: 5px;
+            `}
+          >
+            <a href="#edit" onClick={() => setEditIsActive(true)}>
+              Edit Option
+            </a>
+          </div>
+          <div>
+            <a href="#delete" onClick={deleteItem}>
+              Delete Option
+            </a>
+          </div>
+        </>
       )}
 
       {addNewIsActive && <OptionsForm refreshData={refreshData} />}
@@ -76,6 +89,7 @@ ManageOptionsComponent.defaultProps = {
 ManageOptionsComponent.propTypes = {
   addNewIsActive: bool,
   dataItems: arrayOf(shape(optionPropType)),
+  deleteItem: func.isRequired,
   editIsActive: bool,
   refreshData: func.isRequired,
   selectedItem: shape(optionPropType),
@@ -88,6 +102,7 @@ ManageOptionsComponent.propTypes = {
 export default withTabset({
   displayKey: 'productName',
   primaryKey: 'id',
+  secondaryKey: 'optionType',
   tableName: 'options',
   WrappedComponent: ManageOptionsComponent,
 });

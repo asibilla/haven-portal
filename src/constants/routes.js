@@ -10,6 +10,7 @@ const routes = {
   manageProperties: '/manage-properties',
   manageUser: '/manage-user/:id',
   manageUsers: '/manage-users',
+  optionBuilder: '/option-builder',
   resetPassword: '/reset-password',
   scheduler: '/scheduler',
   userHome: '/welcome',

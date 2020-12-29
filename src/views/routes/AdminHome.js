@@ -15,6 +15,7 @@ import AdminOverview from './AdminOverview';
 import ManageUser from './ManageUser';
 import ManageUsers from './ManageUsers';
 import ManageOptions from './ManageOptions';
+import OptionBuilder from './OptionBuilder';
 import Scheduler from './Scheduler';
 
 const AdminHome = ({ url }) => {
@@ -53,6 +54,7 @@ const AdminHome = ({ url }) => {
             />
             <Route path={`${match.path}${routes.manageUser}`} component={ManageUser} />
             <Route path={`${match.path}${routes.manageUsers}`} component={ManageUsers} />
+            <Route path={`${match.path}${routes.optionBuilder}`} component={OptionBuilder} />
           </Switch>
         </ContentWrapper>
       </PageWrapper>

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 import { func, string } from 'prop-types';
 import React, { Component } from 'react';
 import { cx } from 'react-emotion';
@@ -8,6 +8,7 @@ import { content, tab, tabset } from '../../constants/styles/tabset';
 
 import AppContext from '../../helpers/context';
 import { deleteItem, scanDB } from '../../helpers/db';
+import { deleteImage } from '../../helpers/s3';
 
 import { Spinner } from '../components';
 
@@ -58,16 +59,26 @@ class Tabset extends Component {
     return '';
   }
 
+  async deleteImage(imageKey) {
+    const { authData } = this.context;
+    await deleteImage({ authData, key: imageKey });
+  }
+
   async deleteItem() {
     const { authData } = this.context;
-    const { bridgewayDeleteFn, primaryKey, tableName } = this.props;
+    const { bridgewayDeleteFn, primaryKey, secondaryKey, tableName } = this.props;
     const { selectedItem } = this.state;
+
     if (
       window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')
     ) {
       const item = {
         [primaryKey]: get(selectedItem, primaryKey, null),
       };
+
+      if (secondaryKey) {
+        set(item, secondaryKey, get(selectedItem, secondaryKey));
+      }
 
       try {
         if (bridgewayDeleteFn) {
@@ -76,6 +87,11 @@ class Tabset extends Component {
             throw new Error('Could not delete from Bridgeway system.');
           }
         }
+
+        if (selectedItem.imageKey) {
+          this.deleteImage(selectedItem.imageKey);
+        }
+
         await deleteItem({ authData, item, tableName });
         this.setState({
           selectedItem: null,
@@ -195,11 +211,13 @@ class Tabset extends Component {
 
 Tabset.defaultProps = {
   bridgewayDeleteFn: null,
+  secondaryKey: '',
 };
 
 Tabset.propTypes = {
   bridgewayDeleteFn: func,
   primaryKey: string.isRequired,
+  secondaryKey: string,
   tableName: string.isRequired,
   WrappedComponent: func.isRequired,
 };
