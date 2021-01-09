@@ -20,15 +20,21 @@ const ManageOptionsComponent = ({
   setSelectedItem,
   showEditView,
   updateSuccessMessage,
+  uploadIsActive,
 }) => {
   const onChange = (e) => {
     const selected = find(dataItems, (item) => item.id === e.target.value) || null;
     setSelectedItem(selected);
   };
 
+  const initialView = !editIsActive && !addNewIsActive && !uploadIsActive;
+  const manageView = selectedItem && !editIsActive && !addNewIsActive && !uploadIsActive;
+  const editView = editIsActive && !addNewIsActive && !uploadIsActive && selectedItem;
+  const uploadView = uploadIsActive && !addNewIsActive && !editIsActive;
+
   return (
     <div>
-      {!editIsActive && !addNewIsActive && (
+      {initialView && (
         <DropdownMenu
           id="option"
           label="Select an Option"
@@ -44,7 +50,7 @@ const ManageOptionsComponent = ({
             ))}
         </DropdownMenu>
       )}
-      {selectedItem && !editIsActive && !addNewIsActive && (
+      {manageView && (
         <>
           <div
             className={css`
@@ -64,10 +70,8 @@ const ManageOptionsComponent = ({
       )}
 
       {addNewIsActive && <OptionsForm refreshData={refreshData} />}
-      {!addNewIsActive && !editIsActive && selectedItem && (
-        <OptionsView selectedItem={selectedItem} setEditIsActive={setEditIsActive} />
-      )}
-      {editIsActive && !addNewIsActive && selectedItem && (
+      {manageView && <OptionsView selectedItem={selectedItem} setEditIsActive={setEditIsActive} />}
+      {editView && (
         <OptionsForm
           selectedItem={selectedItem}
           refreshData={refreshData}
@@ -75,6 +79,7 @@ const ManageOptionsComponent = ({
           updateSuccessMessage={updateSuccessMessage}
         />
       )}
+      {uploadView && <h1>Upload view!!</h1>}
     </div>
   );
 };
@@ -84,6 +89,7 @@ ManageOptionsComponent.defaultProps = {
   dataItems: [],
   editIsActive: false,
   selectedItem: null,
+  uploadIsActive: false,
 };
 
 ManageOptionsComponent.propTypes = {
@@ -95,11 +101,14 @@ ManageOptionsComponent.propTypes = {
   selectedItem: shape(optionPropType),
   setEditIsActive: func.isRequired,
   setSelectedItem: func.isRequired,
+  setUploadIsActive: func.isRequired,
   showEditView: func.isRequired,
   updateSuccessMessage: func.isRequired,
+  uploadIsActive: bool,
 };
 
 export default withTabset({
+  allowJsonUpload: true,
   displayKey: 'productName',
   primaryKey: 'id',
   secondaryKey: 'optionType',
