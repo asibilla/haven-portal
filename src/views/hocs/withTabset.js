@@ -1,5 +1,5 @@
 import { get, set } from 'lodash';
-import { func, string } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import React, { Component } from 'react';
 import { cx } from 'react-emotion';
 
@@ -14,6 +14,7 @@ import { Spinner } from '../components';
 
 const ADD_NEW = 'add-new';
 const MANAGE = 'manage';
+const UPLOAD = 'upload';
 
 class Tabset extends Component {
   static contextType = AppContext;
@@ -26,6 +27,7 @@ class Tabset extends Component {
     loading: true,
     selectedItem: null,
     successMessage: '',
+    uploadIsActive: false,
   };
 
   constructor(props) {
@@ -37,6 +39,7 @@ class Tabset extends Component {
     this.setSelectedItem = this.setSelectedItem.bind(this);
     this.showEditView = this.showEditView.bind(this);
     this.updateSuccessMessage = this.updateSuccessMessage.bind(this);
+    this.setUploadIsActive = this.setUploadIsActive.bind(this);
   }
 
   componentDidMount() {
@@ -51,9 +54,17 @@ class Tabset extends Component {
     this.setState({ editIsActive: active });
   }
 
+  setUploadIsActive(active) {
+    this.setState({ uploadIsActive: active });
+  }
+
   getTabState(tabName) {
-    const { addNewIsActive } = this.state;
-    if ((tabName === ADD_NEW && addNewIsActive) || (tabName === MANAGE && !addNewIsActive)) {
+    const { addNewIsActive, uploadIsActive } = this.state;
+    if (
+      (tabName === ADD_NEW && addNewIsActive) ||
+      (tabName === MANAGE && !addNewIsActive && !uploadIsActive) ||
+      (tabName === UPLOAD && uploadIsActive)
+    ) {
       return 'active';
     }
     return '';
@@ -129,11 +140,20 @@ class Tabset extends Component {
   }
 
   updateTabState(tabName) {
-    const { addNewIsActive } = this.state;
+    const { addNewIsActive, uploadIsActive } = this.state;
     return () => {
-      if ((tabName === ADD_NEW && !addNewIsActive) || (tabName === MANAGE && addNewIsActive)) {
-        const newState = !addNewIsActive;
-        this.setState({ addNewIsActive: newState, dbError: null, successMessage: '' });
+      if (
+        (tabName === ADD_NEW && !addNewIsActive) ||
+        (tabName === MANAGE && (addNewIsActive || uploadIsActive)) ||
+        (tabName === UPLOAD && !uploadIsActive)
+      ) {
+        const newState = {
+          addNewIsActive: tabName === ADD_NEW,
+          uploadIsActive: tabName === UPLOAD,
+          dbError: null,
+          successMessage: '',
+        };
+        this.setState(newState);
       }
     };
   }
@@ -147,7 +167,7 @@ class Tabset extends Component {
   }
 
   render() {
-    const { WrappedComponent } = this.props;
+    const { allowJsonUpload, WrappedComponent } = this.props;
     const {
       addNewIsActive,
       dataItems,
@@ -156,6 +176,7 @@ class Tabset extends Component {
       loading,
       selectedItem,
       successMessage,
+      uploadIsActive,
     } = this.state;
 
     return (
@@ -179,6 +200,17 @@ class Tabset extends Component {
           >
             Add New
           </div>
+          {allowJsonUpload && (
+            <div
+              className={cx(tab, this.getTabState(UPLOAD))}
+              onClick={this.updateTabState(UPLOAD)}
+              onKeyPress={this.updateTabState(UPLOAD)}
+              role="button"
+              tabIndex={0}
+            >
+              Upload
+            </div>
+          )}
         </div>
         {loading ? (
           <Spinner />
@@ -199,8 +231,10 @@ class Tabset extends Component {
               selectedItem={selectedItem}
               setEditIsActive={this.setEditIsActive}
               setSelectedItem={this.setSelectedItem}
+              setUploadIsActive={this.setUploadIsActive}
               showEditView={this.showEditView}
               updateSuccessMessage={this.updateSuccessMessage}
+              uploadIsActive={uploadIsActive}
             />
           </div>
         )}
@@ -210,11 +244,13 @@ class Tabset extends Component {
 }
 
 Tabset.defaultProps = {
+  allowJsonUpload: false,
   bridgewayDeleteFn: null,
   secondaryKey: '',
 };
 
 Tabset.propTypes = {
+  allowJsonUpload: bool,
   bridgewayDeleteFn: func,
   primaryKey: string.isRequired,
   secondaryKey: string,

@@ -35,6 +35,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
 
   const [optionType, setOptionType] = useState('finish');
   const [productName, setName] = useState('');
+  const [productCategory, setProductCategory] = useState('');
+  const [productSubcategory, setProductSubcategory] = useState('');
   const [productLevel, setLevel] = useState('base');
   const [productLocation, setLocation] = useState([]);
   const [sellPrice, setSellPrice] = useState('');
@@ -55,6 +57,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
     if (selectedItem) {
       setOptionType(selectedItem.optionType);
       setName(selectedItem.productName);
+      setProductCategory(selectedItem.productCategory);
+      setProductSubcategory(selectedItem.productSubcategory);
       setLevel(selectedItem.productLevel);
       setLocation(selectedItem.productLocation);
       setSellPrice((selectedItem.sellPrice || 0).toString());
@@ -127,6 +131,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const clearState = () => {
     setOptionType('finish');
     setName('');
+    setProductCategory('');
+    setProductSubcategory('');
     setLevel('base');
     setLocation([]);
     setSellPrice('');
@@ -198,6 +204,8 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
         new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice) }),
         new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials) }),
         new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey }),
+        new DBQueryItem({ id: ':k', key: 'productCategory', value: productCategory }),
+        new DBQueryItem({ id: ':k', key: 'productSubcategory', value: productSubcategory }),
       ];
 
       const keyItems = {
@@ -268,6 +276,18 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             labelText="Name:"
             onChange={setValue(setName)}
             value={productName}
+          />
+
+          <TextInput
+            labelText="Category:"
+            onChange={setValue(setProductCategory)}
+            value={productCategory}
+          />
+
+          <TextInput
+            labelText="Subcategory:"
+            onChange={setValue(setProductSubcategory)}
+            value={productSubcategory}
           />
 
           <DropdownMenu
