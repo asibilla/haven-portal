@@ -167,7 +167,7 @@ class Tabset extends Component {
   }
 
   render() {
-    const { WrappedComponent } = this.props;
+    const { allowJsonUpload, WrappedComponent } = this.props;
     const {
       addNewIsActive,
       dataItems,
@@ -200,7 +200,7 @@ class Tabset extends Component {
           >
             Add New
           </div>
-          {this.props.allowJsonUpload && (
+          {allowJsonUpload && (
             <div
               className={cx(tab, this.getTabState(UPLOAD))}
               onClick={this.updateTabState(UPLOAD)}

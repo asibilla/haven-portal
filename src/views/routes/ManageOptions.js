@@ -5,6 +5,7 @@ import { css } from 'react-emotion';
 
 import { DropdownMenu, DropdownOption } from '../components';
 import OptionsForm from '../components/OptionsForm';
+import OptionsUpload from '../components/OptionsUpload';
 import OptionsView from '../components/OptionsView';
 import { optionPropType } from '../../constants/propTypeObjects';
 import withTabset from '../hocs/withTabset';
@@ -79,7 +80,7 @@ const ManageOptionsComponent = ({
           updateSuccessMessage={updateSuccessMessage}
         />
       )}
-      {uploadView && <h1>Upload view!!</h1>}
+      {uploadView && <OptionsUpload />}
     </div>
   );
 };
@@ -101,7 +102,6 @@ ManageOptionsComponent.propTypes = {
   selectedItem: shape(optionPropType),
   setEditIsActive: func.isRequired,
   setSelectedItem: func.isRequired,
-  setUploadIsActive: func.isRequired,
   showEditView: func.isRequired,
   updateSuccessMessage: func.isRequired,
   uploadIsActive: bool,
