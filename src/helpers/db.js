@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk';
-import { forEach } from 'lodash';
+import { forEach, map } from 'lodash';
 
 import { region } from '../constants';
 
@@ -107,6 +107,35 @@ export const putItem = async ({ authData, item, tableName }) => {
     const docClient = await getDocClient(authData);
     return new Promise((resolve, reject) => {
       docClient.put(query, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (e) {
+    return Promise.reject(e);
+  }
+};
+
+export const putItems = async ({ authData, items, tableName }) => {
+  const query = {
+    RequestItems: {
+      [tableName]: map(items, (item) => ({
+        PutRequest: {
+          Item: item,
+        },
+      })),
+    },
+  };
+
+  console.log('your query', query);
+
+  try {
+    const docClient = await getDocClient(authData);
+    return new Promise((resolve, reject) => {
+      docClient.batchWrite(query, (err, data) => {
         if (err) {
           reject(err);
         } else {

@@ -1,23 +1,30 @@
-import { map, pickBy } from 'lodash';
+import { isArray, map, pick } from 'lodash';
 import { func } from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { v4 } from 'uuid';
 
 import { styles } from '../../constants';
-// import { optionPropType } from '../../constants/propTypeObjects';
 import { buttonContainer } from '../../constants/styles/manageOptions';
+
+import AppContext from '../../helpers/context';
+import { putItems } from '../../helpers/db';
 
 import useInput from '../../hooks/useInput';
 
 import { Button, TextArea } from '.';
 
+const convertToNumber = (value) => Number(value || 0);
+const convertToArray = (value) => (isArray(value) ? value : [value || '']);
+
 const OptionsUpload = ({ refreshData }) => {
+  const { authData } = useContext(AppContext);
   const { inputProps, reset, value } = useInput('');
   const [processing, setProcessing] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(null);
   const buttonIsDisabled = !value || processing;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setProcessing(true);
     setSubmitSuccess(null);
@@ -25,9 +32,41 @@ const OptionsUpload = ({ refreshData }) => {
 
     try {
       const rawJson = JSON.parse(value);
+      if (!isArray(rawJson)) {
+        throw new Error('Data must be an array.');
+      }
+      const transformedData = map(rawJson, (dataObject) => {
+        const sanitizedData = pick(
+          dataObject,
+          'contractorPrice',
+          'extendedDescription',
+          'features',
+          'manufacturer',
+          'materials',
+          'imageKey',
+          'optionType',
+          'productCategory',
+          'productDescription',
+          'productLevel',
+          'productLocation',
+          'productName',
+          'productSubcategory',
+          'sellPrice'
+        );
+        return {
+          ...sanitizedData,
+          id: v4(),
+          contractorPrice: convertToNumber(sanitizedData.contractorPrice),
+          features: convertToArray(sanitizedData.features),
+          materials: convertToArray(sanitizedData.materials),
+          productLocation: convertToArray(sanitizedData.productLocation),
+          sellPrice: convertToNumber(sanitizedData.sellPrice),
+        };
+      });
 
-      // reset();
-      // refreshData();
+      await putItems({ authData, items: transformedData, tableName: 'options' });
+      reset();
+      refreshData();
       setSubmitSuccess('Your data has been uploaded!');
     } catch (e) {
       setSubmitError(`An error occured while uploading: ${e.message}`);
