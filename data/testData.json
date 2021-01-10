@@ -1,0 +1,45 @@
+[
+  {
+    "contractorPrice": 123,
+    "extendedDescription": "",
+    "features": ["Traditional"],
+    "manufacturer": "Kohler",
+    "materials": ["Chrome Polish"],
+    "imageKey": "K-597-CP.webp",
+    "optionType": "Finish",
+    "productCategory": "Plumbing",
+    "productDescription": "CORALAIS® STANDARD PULLOUT FCT",
+    "productLevel": "base",
+    "productLocation": ["kitchen"],
+    "productName": "15160-CP",
+    "productSubcategory": "Faucets",
+    "sellPrice": 284.4
+  },
+  {
+    "extendedDescription": "",
+    "features": ["Traditional"],
+    "manufacturer": "Kohler",
+    "materials": ["Brushed Nickel"],
+    "imageKey": "K-597-CP.webp",
+    "optionType": "Finish",
+    "productCategory": "Plumbing",
+    "productDescription": "CORALAIS® STANDARD PULLOUT FCT",
+    "productName": "15160-BN",
+    "productSubcategory": "Faucets",
+    "sellPrice": 383.95
+  },
+  {
+    "features": ["Traditional"],
+    "manufacturer": "Kohler",
+    "materials": ["Chrome Polish"],
+    "imageKey": "K-597-CP.webp",
+    "optionType": "Finish",
+    "productCategory": "Plumbing",
+    "productDescription": "CORALAIS® STANDARD PULLOUT FCT",
+    "productName": "560-CP",
+    "productSubcategory": "Faucets",
+    "sellPrice": 329.7,
+    "extraProp1": "ExtraProp1",
+    "extraProp2": "ExraProp2"
+  }
+]

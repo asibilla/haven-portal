@@ -37,6 +37,13 @@ const OptionsView = ({ selectedItem }) => {
           </div>
         )}
 
+        {selectedItem.manufacturer && (
+          <div className="group">
+            <div className="title">Manufacturer:</div>
+            <div className="value">{selectedItem.manufacturer}</div>
+          </div>
+        )}
+
         {selectedItem.productLevel && (
           <div className="group">
             <div className="title">Level:</div>

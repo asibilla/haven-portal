@@ -80,7 +80,7 @@ const ManageOptionsComponent = ({
           updateSuccessMessage={updateSuccessMessage}
         />
       )}
-      {uploadView && <OptionsUpload />}
+      {uploadView && <OptionsUpload refreshData={refreshData} />}
     </div>
   );
 };
