@@ -1,4 +1,4 @@
-import { isArray, map, pick } from 'lodash';
+import { forEach, isArray, map, pick } from 'lodash';
 import { func } from 'prop-types';
 import React, { useState, useContext } from 'react';
 import { v4 } from 'uuid';
@@ -14,7 +14,11 @@ import useInput from '../../hooks/useInput';
 import { Button, TextArea } from '.';
 
 const convertToNumber = (value) => Number(value || 0);
-const convertToArray = (value) => (isArray(value) ? value : [value || '']);
+const convertToArray = (value) => {
+  if (!value) return [];
+  if (isArray(value)) return value;
+  return [value];
+};
 
 const OptionsUpload = ({ refreshData }) => {
   const { authData } = useContext(AppContext);
@@ -64,12 +68,23 @@ const OptionsUpload = ({ refreshData }) => {
         };
       });
 
+      forEach(transformedData, (dataObject) => {
+        if (!dataObject.productName) {
+          throw new Error('"productName" is required for all items.');
+        }
+        if (!dataObject.optionType || !/^(structural|finish)$/i.test(dataObject.optionType)) {
+          throw new Error(
+            'A value of "finish" or "structural" is required for the value of "optionType" for all items.'
+          );
+        }
+      });
+
       await putItems({ authData, items: transformedData, tableName: 'options' });
       reset();
       refreshData();
       setSubmitSuccess('Your data has been uploaded!');
-    } catch (e) {
-      setSubmitError(`An error occured while uploading: ${e.message}`);
+    } catch (err) {
+      setSubmitError(`An error occured while uploading: ${err.message}`);
     }
     setProcessing(false);
   };

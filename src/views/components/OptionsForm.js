@@ -197,19 +197,23 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
 
     if (selectedItem) {
       const queryItems = [
-        new DBQueryItem({ id: ':a', key: 'contractorPrice', value: Number(contractorPrice) }),
-        new DBQueryItem({ id: ':b', key: 'extendedDescription', value: extendedDescription }),
-        new DBQueryItem({ id: ':c', key: 'features', value: textAreaToArray(features) }),
-        new DBQueryItem({ id: ':d', key: 'productLevel', value: productLevel }),
-        new DBQueryItem({ id: ':e', key: 'productLocation', value: productLocation }),
+        new DBQueryItem({
+          id: ':a',
+          key: 'contractorPrice',
+          value: Number(contractorPrice || 99999),
+        }),
+        new DBQueryItem({ id: ':b', key: 'extendedDescription', value: extendedDescription || '' }),
+        new DBQueryItem({ id: ':c', key: 'features', value: textAreaToArray(features || '') }),
+        new DBQueryItem({ id: ':d', key: 'productLevel', value: productLevel || 'base' }),
+        new DBQueryItem({ id: ':e', key: 'productLocation', value: productLocation || [] }),
         new DBQueryItem({ id: ':f', key: 'productName', value: productName }),
-        new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription }),
-        new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice) }),
-        new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials) }),
-        new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey }),
-        new DBQueryItem({ id: ':k', key: 'productCategory', value: productCategory }),
-        new DBQueryItem({ id: ':l', key: 'productSubcategory', value: productSubcategory }),
-        new DBQueryItem({ id: ':m', key: 'manufacturer', value: manufacturer }),
+        new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription || '' }),
+        new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice || 999999) }),
+        new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials || '') }),
+        new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey || '' }),
+        new DBQueryItem({ id: ':k', key: 'productCategory', value: productCategory || '' }),
+        new DBQueryItem({ id: ':l', key: 'productSubcategory', value: productSubcategory || '' }),
+        new DBQueryItem({ id: ':m', key: 'manufacturer', value: manufacturer || '' }),
       ];
 
       const keyItems = {
@@ -446,7 +450,6 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             {selectedItem && (
               <Button
                 className={styles.buttonSecondary}
-                disabled={buttonIsDisabled}
                 onClick={showEditView(false)}
                 text="Cancel"
               />

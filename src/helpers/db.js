@@ -130,8 +130,6 @@ export const putItems = async ({ authData, items, tableName }) => {
     },
   };
 
-  console.log('your query', query);
-
   try {
     const docClient = await getDocClient(authData);
     return new Promise((resolve, reject) => {
