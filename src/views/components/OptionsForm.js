@@ -37,6 +37,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
   const [productName, setName] = useState('');
   const [productCategory, setProductCategory] = useState('');
   const [productSubcategory, setProductSubcategory] = useState('');
+  const [manufacturer, setManufacturer] = useState('');
   const [productLevel, setLevel] = useState('base');
   const [productLocation, setLocation] = useState([]);
   const [sellPrice, setSellPrice] = useState('');
@@ -59,6 +60,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
       setName(selectedItem.productName);
       setProductCategory(selectedItem.productCategory);
       setProductSubcategory(selectedItem.productSubcategory);
+      setManufacturer(selectedItem.manufacturer);
       setLevel(selectedItem.productLevel);
       setLocation(selectedItem.productLocation);
       setSellPrice((selectedItem.sellPrice || 0).toString());
@@ -133,6 +135,7 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
     setName('');
     setProductCategory('');
     setProductSubcategory('');
+    setManufacturer('');
     setLevel('base');
     setLocation([]);
     setSellPrice('');
@@ -194,18 +197,23 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
 
     if (selectedItem) {
       const queryItems = [
-        new DBQueryItem({ id: ':a', key: 'contractorPrice', value: Number(contractorPrice) }),
-        new DBQueryItem({ id: ':b', key: 'extendedDescription', value: extendedDescription }),
-        new DBQueryItem({ id: ':c', key: 'features', value: textAreaToArray(features) }),
-        new DBQueryItem({ id: ':d', key: 'productLevel', value: productLevel }),
-        new DBQueryItem({ id: ':e', key: 'productLocation', value: productLocation }),
+        new DBQueryItem({
+          id: ':a',
+          key: 'contractorPrice',
+          value: Number(contractorPrice || 99999),
+        }),
+        new DBQueryItem({ id: ':b', key: 'extendedDescription', value: extendedDescription || '' }),
+        new DBQueryItem({ id: ':c', key: 'features', value: textAreaToArray(features || '') }),
+        new DBQueryItem({ id: ':d', key: 'productLevel', value: productLevel || 'base' }),
+        new DBQueryItem({ id: ':e', key: 'productLocation', value: productLocation || [] }),
         new DBQueryItem({ id: ':f', key: 'productName', value: productName }),
-        new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription }),
-        new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice) }),
-        new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials) }),
-        new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey }),
-        new DBQueryItem({ id: ':k', key: 'productCategory', value: productCategory }),
-        new DBQueryItem({ id: ':k', key: 'productSubcategory', value: productSubcategory }),
+        new DBQueryItem({ id: ':g', key: 'productDescription', value: productDescription || '' }),
+        new DBQueryItem({ id: ':h', key: 'sellPrice', value: Number(sellPrice || 999999) }),
+        new DBQueryItem({ id: ':i', key: 'materials', value: textAreaToArray(materials || '') }),
+        new DBQueryItem({ id: ':j', key: 'imageKey', value: imageKey || '' }),
+        new DBQueryItem({ id: ':k', key: 'productCategory', value: productCategory || '' }),
+        new DBQueryItem({ id: ':l', key: 'productSubcategory', value: productSubcategory || '' }),
+        new DBQueryItem({ id: ':m', key: 'manufacturer', value: manufacturer || '' }),
       ];
 
       const keyItems = {
@@ -288,6 +296,12 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             labelText="Subcategory:"
             onChange={setValue(setProductSubcategory)}
             value={productSubcategory}
+          />
+
+          <TextInput
+            labelText="Manufacturer:"
+            onChange={setValue(setManufacturer)}
+            value={manufacturer}
           />
 
           <DropdownMenu
@@ -436,7 +450,6 @@ const OptionsForm = ({ refreshData, selectedItem, showEditView, updateSuccessMes
             {selectedItem && (
               <Button
                 className={styles.buttonSecondary}
-                disabled={buttonIsDisabled}
                 onClick={showEditView(false)}
                 text="Cancel"
               />
